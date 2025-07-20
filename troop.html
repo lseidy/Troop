@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troop - Transporte Seguro e Confiável</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <!-- Custom Styles & Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'troop-purple': '#322275',
+                        'troop-light-gray': '#F5F5F5',
+                        'troop-dark-gray': '#333333',
+                        'troop-white': '#FFFFFF',
+                        'muted': '#E5E7EB',
+                        'muted-foreground': '#6B7280',
+                    },
+                    fontFamily: {
+                        'lato': ['Lato', 'sans-serif'],
+                        'horizon': ['Audiowide', 'cursive'],
+                    },
+                    boxShadow: {
+                        'strong': '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
+                    },
+                    height: {
+                        '128': '32rem', // 512px
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bg-gradient-overlay {
+            /* Overlay com transparência ajustada para tornar a imagem mais visível */
+            background-image: linear-gradient(to top, rgba(50, 34, 117, 0.75) 0%, rgba(50, 34, 117, 0.3) 60%, rgba(50, 34, 117, 0.1) 100%);
+        }
+        /* For date input placeholder */
+        input[type="date"]:not(:valid):before {
+            content: attr(placeholder);
+            color: #6B7280;
+        }
+        .autocomplete-suggestions {
+    position: absolute;
+    z-index: 50;
+    background: #fff;
+    border: 1px solid #ddd;
+    width: 100%;
+    max-height: 180px;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.autocomplete-suggestion {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+.autocomplete-suggestion:hover {
+    background: #f3f3f3;
+}
+    </style>
+</head>
+<body class="font-lato bg-troop-white text-troop-dark-gray">
+
+    <!-- Header -->
+    <header class="absolute top-0 left-0 right-0 z-50 bg-transparent">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-troop-white/90 backdrop-blur-sm p-2 rounded-lg shadow-md flex justify-center">
+                    <img src="https://img.icons8.com/?size=100&id=4190&format=png&color=1A1A1A" alt="Van Escolar" class="h-10 w-10 object-contain" />
+                </div>
+                <span class="font-horizon font-bold text-2xl text-troop-white drop-shadow-lg">Troop</span>
+            </div>
+            <!-- Navigation -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#como-funciona" class="text-troop-white/90 hover:text-troop-white font-lato font-medium transition-colors duration-200">Como Funciona</a>
+                <a href="#rotas" class="text-troop-white/90 hover:text-troop-white font-lato font-medium transition-colors duration-200">Nossas Rotas</a>
+                <a href="#planos" class="text-troop-white/90 hover:text-troop-white font-lato font-medium transition-colors duration-200">Planos</a>
+                <a href="#" class="bg-troop-white/10 border border-troop-white/30 text-troop-white hover:bg-troop-white hover:text-troop-purple backdrop-blur-sm font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm">Login</a>
+            </div>
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <button class="bg-troop-white/10 border border-troop-white/30 text-troop-white backdrop-blur-sm font-semibold py-2 px-4 rounded-lg text-sm">Menu</button>
+            </div>
+        </nav>
+    </header>
+
+        <!-- Hero Section -->
+   <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12">
+    <!-- Background Image (van escolar) com blur -->
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[2px] bg-[url('https://images.unsplash.com/photo-1468136020796-0eec5226a897?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')]"></div>
+    <!-- Overlay para transparência e cor troop-purple mais forte -->
+    <div class="absolute inset-0 bg-gradient-to-tr from-troop-purple/80 via-troop-purple/60 to-troop-purple/30"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 container mx-auto px-6">
+            <div id="etapa-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+                    <!-- Card com campos (lado esquerdo) -->
+                    <div class="bg-troop-white/95 backdrop-blur-sm shadow-strong border-0 p-8 md:p-12 rounded-2xl">
+                        <div class="space-y-4 mb-8">
+                            <div class="grid md:grid-cols-1 gap-4">
+                                <div class="relative">
+                                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <input id="partida" placeholder="Endereço de Partida" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0">
+                                </div>
+                                <div class="relative">
+                                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <input id="destino" placeholder="Endereço da Atividade" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0">
+                                </div>
+                                <div class="relative">
+                                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                    <input id="data" type="date" placeholder="Datas" class="pl-10 pr-3 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0">
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btn-etapa-1" class="w-full bg-troop-purple text-troop-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 flex items-center justify-center text-lg transition-all duration-300 hover:shadow-xl">
+                            <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            BUSCAR ROTAS DISPONÍVEIS
+                        </button>
+                    </div>
+                    <!-- Título (lado direito) -->
+                    <div class="text-right md:pl-8">
+                        <h1 class="font-lato font-black text-4xl md:text-5xl text-troop-white mb-6 leading-tight drop-shadow-lg">
+                            O transporte para suas atividades,<br>
+                            com a <span class="text-troop-purple bg-troop-white/80 px-2 rounded">segurança e confiança</span><br>
+                            que você precisa.
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div id="etapa-2" class="hidden">
+                <!-- Section do mapa + cards de motoristas -->
+                <section class="py-10 bg-troop-white">
+                    <div class="container mx-auto px-6 text-center">
+                        <h2 class="font-horizon text-3xl md:text-4xl text-troop-dark-gray mb-4">Escolha sua rota e motorista</h2>
+                        <div class="relative rounded-xl overflow-hidden shadow-lg h-96 lg:h-128 mb-8">
+                            <div id="map" class="w-full h-full"></div>
+                            <div class="absolute inset-0 pointer-events-none"></div>
+                        </div>
+                        <div id="motoristas-cards" class="grid md:grid-cols-3 gap-6 mt-8"></div>
+                    </div>
+                </section>
+            </div>
+            <div id="etapa-3" class="hidden">
+                <!-- Confirmação/agendamento -->
+                <div class="max-w-xl mx-auto bg-troop-white rounded-xl shadow-lg p-8 text-center">
+                    <h2 class="font-horizon text-3xl text-troop-dark-gray mb-4">Confirmação</h2>
+                    <p class="mb-6">Sua rota foi selecionada! Complete o agendamento abaixo.</p>
+                    <!-- Adicione campos de confirmação/agendamento conforme necessário -->
+                    <button class="bg-troop-purple text-troop-white font-bold py-3 px-6 rounded-lg shadow-lg mt-4">Finalizar Agendamento</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- How It Works Section -->
+        <section id="como-funciona" class="py-20 bg-troop-light-gray">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="font-horizon text-3xl md:text-4xl text-troop-dark-gray mb-4">Simples, Rápido e Confiável</h2>
+                <p class="max-w-2xl mx-auto text-muted-foreground mb-12">Em apenas três passos você organiza seu transporte com total segurança.</p>
+                <div class="grid md:grid-cols-3 gap-10">
+                    <div class="flex flex-col items-center p-6">
+                        <div class="bg-troop-purple/10 text-troop-purple p-4 rounded-full mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+                        <h3 class="font-bold text-xl mb-2">1. Busque o trajeto ideal</h3>
+                        <p class="text-muted-foreground">Encontre a rota perfeita para suas necessidades.</p>
+                    </div>
+                    <div class="flex flex-col items-center p-6">
+                        <div class="bg-troop-purple/10 text-troop-purple p-4 rounded-full mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></div>
+                        <h3 class="font-bold text-xl mb-2">2. Escolha o melhor plano</h3>
+                        <p class="text-muted-foreground">Selecione entre opções diárias, semanais ou mensais.</p>
+                    </div>
+                    <div class="flex flex-col items-center p-6">
+                        <div class="bg-troop-purple/10 text-troop-purple p-4 rounded-full mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                        <h3 class="font-bold text-xl mb-2">3. Agende com segurança</h3>
+                        <p class="text-muted-foreground">Confirme sua viagem com total tranquilidade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Pricing Section -->
+        <section id="planos" class="py-20 bg-troop-light-gray hidden">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="font-horizon text-3xl md:text-4xl text-troop-dark-gray mb-4">Planos feitos para a sua rotina</h2>
+                <p class="max-w-2xl mx-auto text-muted-foreground mb-12">Escolha o plano que melhor se adequa às suas necessidades e economize.</p>
+                <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Plano Diário -->
+                    <div class="bg-troop-white rounded-xl shadow-lg p-8 flex flex-col text-left transition-transform hover:-translate-y-2">
+                        <h3 class="font-horizon text-2xl mb-2">Diário</h3>
+                        <p class="text-muted-foreground mb-6">Perfeito para uso esporádico.</p>
+                        <p class="text-4xl font-bold mb-1">R$25<span class="text-lg font-normal text-muted-foreground">/dia</span></p>
+                        <ul class="space-y-3 text-troop-dark-gray my-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Viagem ida e volta</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Suporte durante a viagem</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Seguro incluído</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Flexibilidade total</li>
+                        </ul>
+                        <a href="#" class="selecionar-plano w-full text-center bg-troop-purple/10 text-troop-purple font-bold py-3 px-4 rounded-lg hover:bg-troop-purple/20 transition-colors">Selecionar</a>
+                    </div>
+                    <!-- Plano Mensal (Destaque) -->
+                    <div class="bg-troop-purple text-troop-white rounded-xl shadow-strong p-8 flex flex-col text-left transition-transform hover:-translate-y-2 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 m-2 bg-troop-white/20 text-troop-white text-xs font-bold px-3 py-1 rounded-full">Melhor Custo-Benefício</div>
+                        <h3 class="font-horizon text-2xl mb-2">Mensal</h3>
+                        <p class="text-troop-white/80 mb-6">Melhor custo-benefício.</p>
+                        <p class="text-4xl font-bold mb-1">R$380<span class="text-lg font-normal text-troop-white/80">/mês</span></p>
+                        <ul class="space-y-3 my-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Viagens ilimitadas</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Suporte VIP 24/7</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Seguro premium+</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Desconto de 50%</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Prioridade na reserva</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>App exclusivo</li>
+                        </ul>
+                        <a href="#" class="selecionar-plano w-full text-center bg-troop-white text-troop-purple font-bold py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors">Escolher Plano</a>
+                    </div>
+                    <!-- Plano Semanal -->
+                    <div class="bg-troop-white rounded-xl shadow-lg p-8 flex flex-col text-left transition-transform hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 m-4 bg-troop-purple/10 text-troop-purple text-xs font-bold px-3 py-1 rounded-full">Economia</div>
+                        <h3 class="font-horizon text-2xl mb-2">Semanal</h3>
+                        <p class="text-muted-foreground mb-6">Economia para uso regular.</p>
+                        <p class="text-4xl font-bold mb-1">R$120<span class="text-lg font-normal text-muted-foreground">/semana</span></p>
+                        <ul class="space-y-3 text-troop-dark-gray my-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Todas as viagens da semana</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Suporte prioritário</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Seguro premium</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Desconto de 30%</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Flexibilidade de horários</li>
+                        </ul>
+                        <a href="#" class="selecionar-plano w-full text-center bg-troop-purple/10 text-troop-purple font-bold py-3 px-4 rounded-lg hover:bg-troop-purple/20 transition-colors">Selecionar</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-troop-dark-gray text-troop-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-3 gap-8 text-center md:text-left">
+                <div class="flex flex-col items-center md:items-start">
+                    <div class="flex items-center space-x-3 mb-4">
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Função de autocomplete para inputs de endereço
+    function setupAutocomplete(inputId) {
+        const input = document.getElementById(inputId);
+        const wrapper = input.parentElement;
+        let suggestionBox = document.createElement('div');
+        suggestionBox.className = 'autocomplete-suggestions';
+        suggestionBox.style.display = 'none';
+        wrapper.appendChild(suggestionBox);
+
+        input.addEventListener('input', function() {
+            const query = input.value.trim();
+            if (query.length < 3) {
+                suggestionBox.style.display = 'none';
+                return;
+            }
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`)
+                .then(res => res.json())
+                .then(data => {
+                    suggestionBox.innerHTML = '';
+                    if (data.length === 0) {
+                        suggestionBox.style.display = 'none';
+                        return;
+                    }
+                    data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'autocomplete-suggestion';
+                        div.textContent = item.display_name;
+                        div.onclick = () => {
+                            input.value = item.display_name;
+                            suggestionBox.style.display = 'none';
+                        };
+                        suggestionBox.appendChild(div);
+                    });
+                    suggestionBox.style.display = 'block';
+                });
+        });
+
+        // Esconde sugestões ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!wrapper.contains(e.target)) {
+                suggestionBox.style.display = 'none';
+            }
+        });
+    }
+
+    setupAutocomplete('partida');
+    setupAutocomplete('destino');
+
+    document.getElementById('btn-etapa-1').onclick = function() {
+        document.getElementById('etapa-1').classList.add('hidden');
+        document.getElementById('etapa-2').classList.remove('hidden');
+        inicializarMapaERotas(); // Chame a função para inicializar o mapa e os cards
+    };
+
+    function inicializarMapaERotas() {
+        // Dados dos motoristas por rota
+        const motoristasPorRota = [
+            {
+                rota: "Escola A",
+                cor: "blue",
+                motoristas: [
+                    { nome: "João Silva", foto: "https://randomuser.me/api/portraits/men/32.jpg", veiculo: "Van Sprinter", placa: "ABC-1234" },
+                    { nome: "Maria Souza", foto: "https://randomuser.me/api/portraits/women/44.jpg", veiculo: "Van Ducato", placa: "XYZ-5678" }
+                ]
+            },
+            {
+                rota: "Escola B",
+                cor: "green",
+                motoristas: [
+                    { nome: "Carlos Lima", foto: "https://randomuser.me/api/portraits/men/65.jpg", veiculo: "Van Boxer", placa: "JKL-4321" }
+                ]
+            },
+            {
+                rota: "Escola C",
+                cor: "red",
+                motoristas: [
+                    { nome: "Ana Paula", foto: "https://randomuser.me/api/portraits/women/68.jpg", veiculo: "Van Master", placa: "QWE-9876" }
+                ]
+            }
+        ];
+
+        // Renderiza os cards de motoristas
+        const cardsContainer = document.getElementById('motoristas-cards');
+        cardsContainer.innerHTML = ""; // Limpa antes de renderizar
+        motoristasPorRota.forEach((rotaObj, idx) => {
+            const rotaDiv = document.createElement('div');
+            rotaDiv.className = "bg-troop-white rounded-xl shadow-lg p-6 flex flex-col items-center";
+            rotaDiv.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <span class="inline-block h-3 w-3 rounded-full mr-2" style="background:${rotaObj.cor}"></span>
+                    <span class="font-bold text-lg">${rotaObj.rota}</span>
+                </div>
+                <div class="flex flex-col space-y-4 w-full">
+                    ${rotaObj.motoristas.map((m, i) => `
+                        <button class="motorista-card w-full flex items-center p-3 rounded-lg border-2 border-${rotaObj.cor}-500 hover:bg-${rotaObj.cor}-100 transition group" 
+                            data-rota="${rotaObj.rota}" data-idx="${idx}">
+                            <img src="${m.foto}" alt="${m.nome}" class="h-12 w-12 rounded-full object-cover mr-4 border-2 border-${rotaObj.cor}-500">
+                            <div class="flex-1 text-left">
+                                <div class="font-semibold">${m.nome}</div>
+                                <div class="text-sm text-muted-foreground">${m.veiculo} • ${m.placa}</div>
+                            </div>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            cardsContainer.appendChild(rotaDiv);
+        });
+
+        // --- MAPA ---
+        var map = L.map('map').setView([-31.7654, -52.3371], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Rotas e polylines
+        var rotas = [
+            {
+                nome: "Escola A",
+                cor: "blue",
+                coords: [
+                    [-31.7654, -52.3371],
+                    [-31.7700, -52.3500],
+                    [-31.7800, -52.3400]
+                ]
+            },
+            {
+                nome: "Escola B",
+                cor: "green",
+                coords: [
+                    [-31.7654, -52.3371],
+                    [-31.7550, -52.3300],
+                    [-31.7500, -52.3200]
+                ]
+            },
+            {
+                nome: "Escola C",
+                cor: "red",
+                coords: [
+                    [-31.7654, -52.3371],
+                    [-31.7600, -52.3450],
+                    [-31.7550, -52.3500]
+                ]
+            }
+        ];
+
+        // Guardar polylines para destacar depois
+        var polylines = [];
+        rotas.forEach((r, idx) => {
+            var poly = L.polyline(r.coords, {color: r.cor, weight: 5, opacity: 0.7}).addTo(map);
+            polylines.push(poly);
+        });
+
+        // Legenda personalizada
+        var legend = L.control({position: 'topright'});
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'info legend bg-white bg-opacity-90 p-3 rounded shadow');
+            div.innerHTML += '<div class="flex items-center mb-2"><span style="background:blue; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>Escola A</div>';
+            div.innerHTML += '<div class="flex items-center mb-2"><span style="background:green; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>Escola B</div>';
+            div.innerHTML += '<div class="flex items-center"><span style="background:red; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>Escola C</div>';
+            return div;
+        };
+        legend.addTo(map);
+
+        // Seleção de rota ao clicar no card do motorista
+        document.querySelectorAll('.motorista-card').forEach((btn) => {
+            btn.addEventListener('click', function() {
+                // Remove destaque de todas as rotas
+                polylines.forEach((poly, i) => poly.setStyle({weight: 5, opacity: 0.7}));
+                // Destaca a rota selecionada
+                const idx = parseInt(this.getAttribute('data-idx'));
+                polylines[idx].setStyle({weight: 9, opacity: 1});
+                map.fitBounds(polylines[idx].getBounds(), {padding: [30, 30]});
+
+                // Esconde etapa 2 e rola para os planos
+                document.getElementById('etapa-2').classList.add('hidden');
+                document.getElementById('planos').classList.remove('hidden'); // <-- Mostra os planos
+                document.getElementById('planos').scrollIntoView({behavior: "smooth"});
+            });
+        });
+    }
+
+    document.querySelectorAll('.selecionar-plano').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = "login.html"; // Troque para o caminho real da sua tela de login/cadastro
+        });
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login ou Cadastro - Troop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'troop-purple': '#322275',
+                        'troop-light-gray': '#F5F5F5',
+                        'troop-dark-gray': '#333333',
+                        'troop-white': '#FFFFFF',
+                        'muted': '#E5E7EB',
+                        'muted-foreground': '#6B7280',
+                    },
+                    fontFamily: {
+                        'lato': ['Lato', 'sans-serif'],
+                        'horizon': ['Audiowide', 'cursive'],
+                    },
+                    boxShadow: {
+                        'strong': '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-troop-light-gray min-h-screen flex items-center justify-center font-lato">
+    <div class="w-full max-w-md mx-auto bg-troop-white rounded-xl shadow-strong p-8 md:p-10">
+        <div class="flex flex-col items-center mb-6">
+            <img src="https://img.icons8.com/?size=100&id=4190&format=png&color=1A1A1A" alt="Van Escolar" class="h-12 w-12 object-contain mb-2" />
+            <span class="font-horizon font-bold text-2xl text-troop-purple">Troop</span>
+        </div>
+        <h1 class="text-2xl font-bold text-troop-purple mb-6 text-center">Entrar ou Cadastrar</h1>
+        <form id="loginForm" class="space-y-4">
+            <input type="email" required placeholder="E-mail" class="w-full border-2 border-muted rounded-lg px-4 py-3 focus:outline-none focus:border-troop-purple transition">
+            <input type="password" required placeholder="Senha" class="w-full border-2 border-muted rounded-lg px-4 py-3 focus:outline-none focus:border-troop-purple transition">
+            <button type="submit" class="w-full bg-troop-purple text-white font-bold py-3 rounded-lg hover:bg-troop-purple/90 transition text-lg">Entrar</button>
+        </form>
+        <p class="text-center text-sm text-muted-foreground mt-4">Ainda não tem conta? Basta preencher e clicar em Entrar.</p>
+        <a href="index.html" class="block text-center text-troop-purple mt-6 hover:underline text-sm">Voltar para o início</a>
+    </div>
+    <script>
+    document.getElementById('loginForm').onsubmit = function(e) {
+        e.preventDefault();
+        window.location.href = "concluido.html";
+    }
+    </script>
+</body>
+</html>

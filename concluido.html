@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Agendamento Concluído - Troop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'troop-purple': '#322275',
+                        'troop-light-gray': '#F5F5F5',
+                        'troop-dark-gray': '#333333',
+                        'troop-white': '#FFFFFF',
+                        'muted': '#E5E7EB',
+                        'muted-foreground': '#6B7280',
+                    },
+                    fontFamily: {
+                        'lato': ['Lato', 'sans-serif'],
+                        'horizon': ['Audiowide', 'cursive'],
+                    },
+                    boxShadow: {
+                        'strong': '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-troop-light-gray min-h-screen flex items-center justify-center font-lato">
+    <div class="w-full max-w-md mx-auto bg-troop-white rounded-xl shadow-strong p-10 flex flex-col items-center">
+        <svg class="mx-auto mb-4 text-green-500" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        <h1 class="text-3xl font-bold text-troop-purple mb-4 text-center">Agendamento Concluído!</h1>
+        <p class="text-lg text-troop-dark-gray mb-6 text-center">Seu transporte foi agendado com sucesso.<br>Em breve você receberá mais informações por e-mail.</p>
+        <a href="troop.html" class="w-full bg-troop-purple text-white px-6 py-3 rounded-lg font-bold hover:bg-troop-purple/80 transition text-center">Voltar para o início</a>
+    </div>
+</body>
+</html>
