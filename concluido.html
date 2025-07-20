@@ -39,7 +39,25 @@
         <svg class="mx-auto mb-4 text-green-500" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
         <h1 class="text-3xl font-bold text-troop-purple mb-4 text-center">Agendamento Concluído!</h1>
         <p class="text-lg text-troop-dark-gray mb-6 text-center">Seu transporte foi agendado com sucesso.<br>Em breve você receberá mais informações por e-mail.</p>
-        <a href="troop.html" class="w-full bg-troop-purple text-white px-6 py-3 rounded-lg font-bold hover:bg-troop-purple/80 transition text-center">Voltar para o início</a>
+        <a id="btn-voltar-inicio" href="#" class="w-full bg-troop-purple text-white px-6 py-3 rounded-lg font-bold hover:bg-troop-purple/80 transition text-center">Voltar para o início</a>
     </div>
 </body>
+<script>
+// Retorno manual respeitando origem
+document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('btn-voltar-inicio');
+    if (btn) {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            var origem = localStorage.getItem('troop_origem');
+            if (origem === 'mobile') {
+                window.location.href = "troop-mobile.html";
+            } else {
+                window.location.href = "troop.html";
+            }
+            localStorage.removeItem('troop_origem');
+        };
+    }
+});
+</script>
 </html>

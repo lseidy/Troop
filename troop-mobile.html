@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troop Mobile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'troop-purple': '#322275',
+                        'troop-light-gray': '#F5F5F5',
+                        'troop-dark-gray': '#333333',
+                        'troop-white': '#FFFFFF',
+                        'muted': '#E5E7EB',
+                        'muted-foreground': '#6B7280',
+                    },
+                    fontFamily: {
+                        'lato': ['Lato', 'sans-serif'],
+                        'horizon': ['Audiowide', 'cursive'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Lato', sans-serif; }
+    </style>
+</head>
+<body class="font-lato bg-troop-white min-h-screen flex flex-col justify-between text-troop-dark-gray">
+    <!-- Header -->
+    <header class="w-full flex flex-col items-center pt-6 pb-2 bg-troop-purple">
+        <div class="flex flex-col items-center">
+            <div class="h-12 w-12 bg-troop-white rounded-2xl shadow-lg flex items-center justify-center mb-2">
+                <img src="https://img.icons8.com/?size=100&id=QTQ1x0Wu6rnn&format=png&color=000000" alt="Van Escolar" class="h-8 w-8 object-contain drop-shadow-xl" />
+            </div>
+            <span class="font-horizon text-xl text-troop-white font-black tracking-wider drop-shadow">Troop</span>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col justify-center px-4 py-6">
+        <!-- Etapa 1 -->
+        <div id="etapa-1-mobile">
+            <h1 class="text-center text-2xl font-black text-troop-purple mb-8 leading-snug font-lato">O transporte para suas atividades,<br><span class="text-troop-purple bg-troop-white/80 px-2 rounded">segurança e confiança</span><br>que você precisa.</h1>
+            <form class="space-y-4 w-full max-w-xs mx-auto">
+                <div class="relative">
+                    <input id="partida" placeholder="Endereço de Partida" class="pl-4 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 font-lato text-troop-dark-gray bg-troop-white" />
+                </div>
+                <div class="relative">
+                    <select id="destino" class="pl-4 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 font-lato bg-troop-white text-troop-dark-gray">
+                        <option value="" disabled selected hidden>Escolha a escola</option>
+                        <option value="Escola A">Escola A</option>
+                        <option value="Escola B">Escola B</option>
+                        <option value="Escola C">Escola C</option>
+                    </select>
+                </div>
+                <div class="relative">
+                    <input id="data" type="date" placeholder="Datas" class="pl-4 pr-3 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 font-lato text-troop-dark-gray bg-troop-white" />
+                </div>
+                <button id="btn-etapa-1-mobile" type="button" class="w-full bg-troop-purple text-troop-white font-bold py-3 rounded-lg shadow-lg text-lg mt-2 font-lato active:scale-95 transition-all">Buscar Rotas</button>
+            </form>
+        </div>
+        <!-- Etapa 2 -->
+        <div id="etapa-2-mobile" class="hidden">
+            <h2 class="text-center font-horizon text-2xl text-troop-dark-gray mb-2 mt-4">Escolha sua rota e motorista</h2>
+            <div id="destino-nome-mobile" class="text-center text-troop-purple font-bold mb-4"></div>
+            <!-- Mapa -->
+            <div class="w-full flex justify-center mb-4">
+                <div id="mapa-mobile" class="rounded-xl shadow-lg border border-troop-purple" style="width: 100%; max-width: 350px; height: 180px;"></div>
+            </div>
+            <div class="bg-troop-white rounded-xl shadow-lg p-4 flex flex-col items-center mb-6">
+                <div class="w-full flex flex-col gap-4">
+                    <button class="motorista-card-mobile w-full flex items-center p-3 rounded-lg border-2 border-blue-500 hover:bg-blue-100 transition group" data-rota="Escola A">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="João Silva" class="h-10 w-10 rounded-full object-cover mr-3 border-2 border-blue-500">
+                        <div class="flex-1 text-left">
+                            <div class="font-semibold">João Silva</div>
+                            <div class="text-sm text-muted-foreground">Van Sprinter • ABC-1234</div>
+                        </div>
+                    </button>
+                    <button class="motorista-card-mobile w-full flex items-center p-3 rounded-lg border-2 border-blue-500 hover:bg-blue-100 transition group" data-rota="Escola A">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Maria Souza" class="h-10 w-10 rounded-full object-cover mr-3 border-2 border-blue-500">
+                        <div class="flex-1 text-left">
+                            <div class="font-semibold">Maria Souza</div>
+                            <div class="text-sm text-muted-foreground">Van Ducato • XYZ-5678</div>
+                        </div>
+                    </button>
+                    <button class="motorista-card-mobile w-full flex items-center p-3 rounded-lg border-2 border-green-500 hover:bg-green-100 transition group" data-rota="Escola B">
+                        <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Carlos Lima" class="h-10 w-10 rounded-full object-cover mr-3 border-2 border-green-500">
+                        <div class="flex-1 text-left">
+                            <div class="font-semibold">Carlos Lima</div>
+                            <div class="text-sm text-muted-foreground">Van Boxer • JKL-4321</div>
+                        </div>
+                    </button>
+                    <button class="motorista-card-mobile w-full flex items-center p-3 rounded-lg border-2 border-red-500 hover:bg-red-100 transition group" data-rota="Escola C">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Ana Paula" class="h-10 w-10 rounded-full object-cover mr-3 border-2 border-red-500">
+                        <div class="flex-1 text-left">
+                            <div class="font-semibold">Ana Paula</div>
+                            <div class="text-sm text-muted-foreground">Van Master • QWE-9876</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Etapa 2.5: Planos -->
+        <div id="etapa-planos-mobile" class="hidden">
+            <h2 class="text-center font-horizon text-2xl text-troop-dark-gray mb-2 mt-4">Escolha um plano</h2>
+            <div class="flex flex-col gap-4 max-w-xs mx-auto mt-4">
+                <button class="plano-card-mobile w-full flex flex-col items-start p-4 rounded-lg border-2 border-troop-purple hover:bg-troop-light-gray transition group" data-plano="Avulso">
+                    <span class="font-bold text-troop-purple text-lg">Avulso</span>
+                    <span class="text-troop-dark-gray text-sm">Viagem única</span>
+                    <span class="text-troop-purple font-black text-xl mt-1">R$ 20,00</span>
+                </button>
+                <button class="plano-card-mobile w-full flex flex-col items-start p-4 rounded-lg border-2 border-troop-purple hover:bg-troop-light-gray transition group" data-plano="Semanal">
+                    <span class="font-bold text-troop-purple text-lg">Semanal</span>
+                    <span class="text-troop-dark-gray text-sm">5 viagens</span>
+                    <span class="text-troop-purple font-black text-xl mt-1">R$ 90,00</span>
+                </button>
+                <button class="plano-card-mobile w-full flex flex-col items-start p-4 rounded-lg border-2 border-troop-purple hover:bg-troop-light-gray transition group" data-plano="Mensal">
+                    <span class="font-bold text-troop-purple text-lg">Mensal</span>
+                    <span class="text-troop-dark-gray text-sm">20 viagens</span>
+                    <span class="text-troop-purple font-black text-xl mt-1">R$ 320,00</span>
+                </button>
+            </div>
+        </div>
+        <!-- Etapa 3 -->
+        <div id="etapa-3-mobile" class="hidden">
+            <div class="max-w-xs mx-auto bg-troop-white rounded-xl shadow-lg p-6 text-center">
+                <h2 class="font-horizon text-2xl text-troop-dark-gray mb-4">Confirmação</h2>
+                <p class="mb-6">Sua rota foi selecionada! Complete o agendamento abaixo.</p>
+                <button class="bg-troop-purple text-troop-white font-bold py-3 px-6 rounded-lg shadow-lg mt-4 w-full">Finalizar Agendamento</button>
+            </div>
+        </div>
+    </main>
+    <!-- Footer/Login -->
+    <footer class="w-full py-4 bg-troop-purple flex justify-center">
+        <a href="#" class="w-full max-w-xs bg-troop-white text-troop-purple font-bold py-3 rounded-full shadow-lg text-base font-lato text-center block active:scale-95 transition-all">Login</a>
+    </footer>
+    <script>
+    // Etapas mobile
+    document.addEventListener("DOMContentLoaded", function () {
+        let destinoEscolhido = '';
+        let mapaMobile = null;
+        // Etapa 1 para Etapa 2
+        document.getElementById('btn-etapa-1-mobile').onclick = function() {
+            // Pega o valor do select
+            const select = document.getElementById('destino');
+            destinoEscolhido = select.value;
+            // Mostra o nome do destino na etapa 2
+            document.getElementById('destino-nome-mobile').textContent = destinoEscolhido ? destinoEscolhido : '';
+            document.getElementById('etapa-1-mobile').classList.add('hidden');
+            document.getElementById('etapa-2-mobile').classList.remove('hidden');
+            // Inicializa o mapa se ainda não foi criado
+            setTimeout(function() {
+                // Coordenadas de Pelotas
+                const pelotas = [-31.765398, -52.337104];
+                // Rotas fictícias para cada escola
+                const rotas = [
+                    {
+                        nome: 'Escola A',
+                        cor: '#3B82F6', // azul
+                        coords: [
+                            pelotas,
+                            [-31.760, -52.350],
+                            [-31.755, -52.340]
+                        ]
+                    },
+                    {
+                        nome: 'Escola B',
+                        cor: '#22C55E', // verde
+                        coords: [
+                            pelotas,
+                            [-31.770, -52.330],
+                            [-31.780, -52.320]
+                        ]
+                    },
+                    {
+                        nome: 'Escola C',
+                        cor: '#EF4444', // vermelho
+                        coords: [
+                            pelotas,
+                            [-31.770, -52.350],
+                            [-31.785, -52.355]
+                        ]
+                    }
+                ];
+                if (!mapaMobile) {
+                    mapaMobile = L.map('mapa-mobile').setView(pelotas, 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(mapaMobile);
+                    // Marcador central
+                    L.marker(pelotas).addTo(mapaMobile).bindPopup('Centro de Pelotas');
+                    // Desenha as rotas
+                    rotas.forEach(rota => {
+                        L.polyline(rota.coords, {color: rota.cor, weight: 5, opacity: 0.8}).addTo(mapaMobile)
+                            .bindPopup(rota.nome);
+                        // Marcador final da rota
+                        L.circleMarker(rota.coords[rota.coords.length-1], {radius: 7, color: rota.cor, fillColor: rota.cor, fillOpacity: 0.9}).addTo(mapaMobile)
+                            .bindPopup(rota.nome);
+                    });
+                } else {
+                    mapaMobile.invalidateSize();
+                }
+            }, 200);
+        };
+        // Etapa 2 para Etapa Planos
+        document.querySelectorAll('.motorista-card-mobile').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('etapa-2-mobile').classList.add('hidden');
+                document.getElementById('etapa-planos-mobile').classList.remove('hidden');
+            });
+        });
+        // Etapa Planos para Login
+        document.querySelectorAll('.plano-card-mobile').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Marca que o usuário está agendando (flag para pós-login) e origem mobile
+                localStorage.setItem('troop_agendamento', '1');
+                localStorage.setItem('troop_origem', 'mobile');
+                window.location.href = "login.html";
+            });
+        });
+        // Botão login (footer)
+        document.querySelector('footer a').onclick = function(e) {
+            e.preventDefault();
+            window.location.href = "login.html";
+        };
+
+        // Se veio do login e estava agendando, mostra concluido.html
+        if (window.location.pathname.endsWith('login.html')) {
+            // Simula login: ao carregar login, se flag setada, redireciona para concluido
+            if (localStorage.getItem('troop_agendamento') === '1') {
+                localStorage.removeItem('troop_agendamento');
+                setTimeout(function() {
+                    window.location.href = "concluido.html";
+                }, 500); // pequeno delay para simular login
+            }
+        }
+        // Se está na concluido.html, volta para a home correta após alguns segundos
+        if (window.location.pathname.endsWith('concluido.html')) {
+            var origem = localStorage.getItem('troop_origem');
+            setTimeout(function() {
+                if (origem === 'mobile') {
+                    window.location.href = "troop-mobile.html";
+                } else {
+                    window.location.href = "troop.html";
+                }
+                localStorage.removeItem('troop_origem');
+            }, 2000); // 2 segundos de exibição
+        }
+    });
+    </script>
+</body>
+</html>
