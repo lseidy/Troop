@@ -32,6 +32,24 @@
     </script>
     <style>
         body { font-family: 'Lato', sans-serif; }
+        .autocomplete-suggestions {
+            position: absolute;
+            z-index: 50;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            width: 100%;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .autocomplete-suggestion {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+        }
+        .autocomplete-suggestion:hover {
+            background: #f5f5f5;
+        }
     </style>
 </head>
 <body class="font-lato bg-troop-white min-h-screen flex flex-col justify-between text-troop-dark-gray">
@@ -51,7 +69,8 @@
             <h1 class="text-center text-2xl font-black text-troop-purple mb-8 leading-snug font-lato">O transporte para suas atividades,<br><span class="text-troop-purple bg-troop-white/80 px-2 rounded">segurança e confiança</span><br>que você precisa.</h1>
             <form class="space-y-4 w-full max-w-xs mx-auto">
                 <div class="relative">
-                    <input id="partida" placeholder="Endereço de Partida" class="pl-4 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 font-lato text-troop-dark-gray bg-troop-white" />
+                    <input id="partida" autocomplete="off" placeholder="Endereço de Partida" class="pl-4 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 font-lato text-troop-dark-gray bg-troop-white" />
+                    <div id="partida-suggestions" class="autocomplete-suggestions hidden"></div>
                 </div>
                 <div class="relative">
                     <select id="destino" class="pl-4 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 font-lato bg-troop-white text-troop-dark-gray">
@@ -142,7 +161,178 @@
     <footer class="w-full py-4 bg-troop-purple flex justify-center">
         <a href="#" class="w-full max-w-xs bg-troop-white text-troop-purple font-bold py-3 rounded-full shadow-lg text-base font-lato text-center block active:scale-95 transition-all">Login</a>
     </footer>
+    <!-- Mapbox Places API -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
+    // Unificado: Autocomplete de endereços brasileiros usando Mapbox + Etapas mobile
+    const mapboxToken = 'pk.eyJ1IjoidHJvb3BhaSIsImEiOiJja3Z2b2J2b2MwM2JwMnBvN2F2b2Z2b2JvIn0.1v6w1Qw8Qw8Qw8Qw8Qw8Qw';
+    window.addEventListener("DOMContentLoaded", function () {
+        // --- Autocomplete Mapbox ---
+        const partidaInput = document.getElementById('partida');
+        const suggestionsBox = document.getElementById('partida-suggestions');
+        let debounceTimeout;
+        function showSuggestions(items) {
+            suggestionsBox.innerHTML = items;
+            suggestionsBox.classList.remove('hidden');
+        }
+        function hideSuggestions() {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.classList.add('hidden');
+        }
+        if (partidaInput && suggestionsBox && typeof axios !== 'undefined') {
+            partidaInput.addEventListener('input', function() {
+                clearTimeout(debounceTimeout);
+                const query = partidaInput.value.trim();
+                if (query.length < 3) {
+                    hideSuggestions();
+                    return;
+                }
+                debounceTimeout = setTimeout(() => {
+                    axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`, {
+                        params: {
+                            access_token: mapboxToken,
+                            country: 'BR',
+                            language: 'pt',
+                            limit: 5
+                        }
+                    }).then(res => {
+                        const features = res.data.features;
+                        if (features.length === 0) {
+                            showSuggestions('<div class="autocomplete-suggestion">Nenhum endereço encontrado</div>');
+                        } else {
+                            showSuggestions(features.map(f => `<div class='autocomplete-suggestion' data-place='${f.place_name.replace(/'/g, "&apos;")}' >${f.place_name}</div>`).join(''));
+                        }
+                    }).catch(err => {
+                        showSuggestions('<div class="autocomplete-suggestion">Erro ao buscar endereços</div>');
+                        console.error('Erro Mapbox:', err);
+                    });
+                }, 300);
+            });
+            suggestionsBox.addEventListener('mousedown', function(e) {
+                if (e.target.classList.contains('autocomplete-suggestion')) {
+                    partidaInput.value = e.target.getAttribute('data-place');
+                    hideSuggestions();
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (!suggestionsBox.contains(e.target) && e.target !== partidaInput) {
+                    hideSuggestions();
+                }
+            });
+        }
+
+        // --- Etapas mobile (restante do código permanece igual) ---
+        let destinoEscolhido = '';
+        let mapaMobile = null;
+        // Etapa 1 para Etapa 2
+        document.getElementById('btn-etapa-1-mobile').onclick = function() {
+            // Pega o valor do select
+            const select = document.getElementById('destino');
+            destinoEscolhido = select.value;
+            // Mostra o nome do destino na etapa 2
+            document.getElementById('destino-nome-mobile').textContent = destinoEscolhido ? destinoEscolhido : '';
+            document.getElementById('etapa-1-mobile').classList.add('hidden');
+            document.getElementById('etapa-2-mobile').classList.remove('hidden');
+            // Inicializa o mapa se ainda não foi criado
+            setTimeout(function() {
+                // Coordenadas de Pelotas
+                const pelotas = [-31.765398, -52.337104];
+                // Rotas fictícias para cada escola
+                const rotas = [
+                    {
+                        nome: 'Escola A',
+                        cor: '#3B82F6', // azul
+                        coords: [
+                            pelotas,
+                            [-31.760, -52.350],
+                            [-31.755, -52.340]
+                        ]
+                    },
+                    {
+                        nome: 'Escola B',
+                        cor: '#22C55E', // verde
+                        coords: [
+                            pelotas,
+                            [-31.770, -52.330],
+                            [-31.780, -52.320]
+                        ]
+                    },
+                    {
+                        nome: 'Escola C',
+                        cor: '#EF4444', // vermelho
+                        coords: [
+                            pelotas,
+                            [-31.770, -52.350],
+                            [-31.785, -52.355]
+                        ]
+                    }
+                ];
+                if (!mapaMobile) {
+                    mapaMobile = L.map('mapa-mobile').setView(pelotas, 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(mapaMobile);
+                    // Marcador central
+                    L.marker(pelotas).addTo(mapaMobile).bindPopup('Centro de Pelotas');
+                    // Desenha as rotas
+                    rotas.forEach(rota => {
+                        L.polyline(rota.coords, {color: rota.cor, weight: 5, opacity: 0.8}).addTo(mapaMobile)
+                            .bindPopup(rota.nome);
+                        // Marcador final da rota
+                        L.circleMarker(rota.coords[rota.coords.length-1], {radius: 7, color: rota.cor, fillColor: rota.cor, fillOpacity: 0.9}).addTo(mapaMobile)
+                            .bindPopup(rota.nome);
+                    });
+                } else {
+                    mapaMobile.invalidateSize();
+                }
+            }, 200);
+        };
+        // Etapa 2 para Etapa Planos
+        document.querySelectorAll('.motorista-card-mobile').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('etapa-2-mobile').classList.add('hidden');
+                document.getElementById('etapa-planos-mobile').classList.remove('hidden');
+            });
+        });
+        // Etapa Planos para Login
+        document.querySelectorAll('.plano-card-mobile').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Marca que o usuário está agendando (flag para pós-login) e origem mobile
+                localStorage.setItem('troop_agendamento', '1');
+                localStorage.setItem('troop_origem', 'mobile');
+                window.location.href = "login.html";
+            });
+        });
+        // Botão login (footer)
+        document.querySelector('footer a').onclick = function(e) {
+            e.preventDefault();
+            window.location.href = "login.html";
+        };
+
+        // Se veio do login e estava agendando, mostra concluido.html
+        if (window.location.pathname.endsWith('login.html')) {
+            // Simula login: ao carregar login, se flag setada, redireciona para concluido
+            if (localStorage.getItem('troop_agendamento') === '1') {
+                localStorage.removeItem('troop_agendamento');
+                setTimeout(function() {
+                    window.location.href = "concluido.html";
+                }, 500); // pequeno delay para simular login
+            }
+        }
+        // Se está na concluido.html, volta para a home correta após alguns segundos
+        if (window.location.pathname.endsWith('concluido.html')) {
+            var origem = localStorage.getItem('troop_origem');
+            setTimeout(function() {
+                if (origem === 'mobile') {
+                    window.location.href = "troop-mobile.html";
+                } else {
+                    window.location.href = "troop.html";
+                }
+                localStorage.removeItem('troop_origem');
+            }, 2000); // 2 segundos de exibição
+        }
+    });
+    </script>
     // Etapas mobile
     document.addEventListener("DOMContentLoaded", function () {
         let destinoEscolhido = '';

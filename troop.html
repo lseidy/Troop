@@ -100,7 +100,7 @@
         <!-- Hero Section -->
    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12">
     <!-- Background Image (van escolar) com blur -->
-    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[2px] bg-[url('https://images.unsplash.com/photo-1468136020796-0eec5226a897?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')]"></div>
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[2px] bg-[url('https://przewozosobnysa.pl/wp-content/uploads/2024/06/ludzie-wchodzacy-do-busa.jpg')]"></div>
     <!-- Overlay para transparência e cor troop-purple mais forte -->
     <div class="absolute inset-0 bg-gradient-to-tr from-troop-purple/80 via-troop-purple/60 to-troop-purple/30"></div>
 
@@ -261,45 +261,75 @@
                     <div class="flex items-center space-x-3 mb-4">
     <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Função de autocomplete para inputs de endereço
+
+    // Função de autocomplete usando Nominatim (OpenStreetMap)
     function setupAutocomplete(inputId) {
         const input = document.getElementById(inputId);
+        if (!input) return;
+        // Garante que o wrapper seja relative para posicionamento absoluto do suggestionBox
         const wrapper = input.parentElement;
-        let suggestionBox = document.createElement('div');
-        suggestionBox.className = 'autocomplete-suggestions';
-        suggestionBox.style.display = 'none';
-        wrapper.appendChild(suggestionBox);
-
-        input.addEventListener('input', function() {
+        if (getComputedStyle(wrapper).position === 'static') {
+            wrapper.style.position = 'relative';
+        }
+        let suggestionBox = wrapper.querySelector('.autocomplete-suggestions');
+        if (!suggestionBox) {
+            suggestionBox = document.createElement('div');
+            suggestionBox.className = 'autocomplete-suggestions';
+            suggestionBox.style.display = 'none';
+            suggestionBox.style.position = 'absolute';
+            suggestionBox.style.zIndex = '9999';
+            suggestionBox.style.left = '0';
+            suggestionBox.style.right = '0';
+            suggestionBox.style.width = '100%';
+            wrapper.appendChild(suggestionBox);
+        }
+        let debounceTimeout;
+        input.addEventListener('input', function () {
+            clearTimeout(debounceTimeout);
             const query = input.value.trim();
             if (query.length < 3) {
                 suggestionBox.style.display = 'none';
+                suggestionBox.innerHTML = '';
                 return;
             }
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`)
-                .then(res => res.json())
-                .then(data => {
-                    suggestionBox.innerHTML = '';
-                    if (data.length === 0) {
-                        suggestionBox.style.display = 'none';
-                        return;
+            debounceTimeout = setTimeout(() => {
+                // Nominatim API (OpenStreetMap)
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5&accept-language=pt-BR`;
+                fetch(url, {
+                    headers: {
+                        'User-Agent': 'TroopApp/1.0 (contato@troop.com)',
+                        'Referer': window.location.origin
                     }
-                    data.forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'autocomplete-suggestion';
-                        div.textContent = item.display_name;
-                        div.onclick = () => {
-                            input.value = item.display_name;
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        suggestionBox.innerHTML = '';
+                        if (!data || data.length === 0) {
                             suggestionBox.style.display = 'none';
-                        };
-                        suggestionBox.appendChild(div);
+                            return;
+                        }
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'autocomplete-suggestion';
+                            div.textContent = item.display_name;
+                            div.onmousedown = (e) => {
+                                e.preventDefault();
+                                input.value = item.display_name;
+                                suggestionBox.style.display = 'none';
+                            };
+                            suggestionBox.appendChild(div);
+                        });
+                        suggestionBox.style.display = 'block';
+                    })
+                    .catch((err) => {
+                        suggestionBox.style.display = 'none';
+                        suggestionBox.innerHTML = '';
+                        console.error('Erro no autocomplete:', err);
                     });
-                    suggestionBox.style.display = 'block';
-                });
+            }, 300);
         });
-
         // Esconde sugestões ao clicar fora
-        document.addEventListener('click', function(e) {
+        document.addEventListener('mousedown', function (e) {
             if (!wrapper.contains(e.target)) {
                 suggestionBox.style.display = 'none';
             }
@@ -307,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     setupAutocomplete('partida');
-    setupAutocomplete('destino');
+    // Para o campo destino, manter como select (não autocomplete)
 
     document.getElementById('btn-etapa-1').onclick = function() {
         document.getElementById('etapa-1').classList.add('hidden');
@@ -331,6 +361,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 cor: "green",
                 motoristas: [
                     { nome: "Carlos Lima", foto: "https://randomuser.me/api/portraits/men/65.jpg", veiculo: "Van Boxer", placa: "JKL-4321" }
+                ]
+            },
+            {
+                rota: "SENAC",
+                cor: "purple",
+                motoristas: [
+                    { nome: "Fernanda Alves", foto: "https://randomuser.me/api/portraits/women/50.jpg", veiculo: "Van Renault Master", placa: "SEN-2025" }
                 ]
             },
             {
@@ -370,48 +407,76 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // --- MAPA ---
-        var map = L.map('map').setView([-31.7654, -52.3371], 13);
 
+        var map = L.map('map');
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         // Rotas e polylines
-        var rotas = [
+        const rotas = [
             {
                 nome: "Escola A",
                 cor: "blue",
-                coords: [
-                    [-31.7654, -52.3371],
-                    [-31.7700, -52.3500],
-                    [-31.7800, -52.3400]
-                ]
+                origem: [-31.7654, -52.3371],
+                destino: [-31.7800, -52.3400]
             },
             {
                 nome: "Escola B",
                 cor: "green",
-                coords: [
-                    [-31.7654, -52.3371],
-                    [-31.7550, -52.3300],
-                    [-31.7500, -52.3200]
-                ]
+                origem: [-31.7654, -52.3371],
+                destino: [-31.7500, -52.3200]
+            },
+            {
+                nome: "SENAC",
+                cor: "purple",
+                origem: [-31.7616, -52.3867],
+                destino: [-31.77019, -52.34177] // Rua Gonçalves Chaves, 604, ponto ajustado na calçada
             },
             {
                 nome: "Escola C",
                 cor: "red",
-                coords: [
-                    [-31.7654, -52.3371],
-                    [-31.7600, -52.3450],
-                    [-31.7550, -52.3500]
-                ]
+                origem: [-31.7654, -52.3371],
+                destino: [-31.7550, -52.3500]
             }
         ];
-
-        // Guardar polylines para destacar depois
         var polylines = [];
-        rotas.forEach((r, idx) => {
-            var poly = L.polyline(r.coords, {color: r.cor, weight: 5, opacity: 0.7}).addTo(map);
+        var boundsArray = [];
+
+        // Função auxiliar para adicionar polyline e ajustar bounds
+        function addPolyline(coords, color) {
+            var poly = L.polyline(coords, {color: color, weight: 5, opacity: 0.7}).addTo(map);
             polylines.push(poly);
+            boundsArray.push(poly.getBounds());
+        }
+
+        // Adiciona todas as rotas usando OSRM para traçado real
+        Promise.all(rotas.map((r, idx) => {
+            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${r.origem[1]},${r.origem[0]};${r.destino[1]},${r.destino[0]}?overview=full&geometries=geojson`;
+            return fetch(osrmUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.routes && data.routes.length > 0) {
+                        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                        addPolyline(coords, r.cor);
+                    } else {
+                        addPolyline([r.origem, r.destino], r.cor);
+                    }
+                })
+                .catch(() => {
+                    addPolyline([r.origem, r.destino], r.cor);
+                });
+        })).then(() => {
+            // Após todas as rotas, ajustar o mapa para mostrar tudo
+            if (boundsArray.length > 0) {
+                var allBounds = boundsArray[0];
+                for (let i = 1; i < boundsArray.length; i++) {
+                    allBounds = allBounds.extend(boundsArray[i]);
+                }
+                map.fitBounds(allBounds, {padding: [30, 30]});
+            } else {
+                map.setView([-31.7654, -52.3371], 13);
+            }
         });
 
         // Legenda personalizada
@@ -420,6 +485,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var div = L.DomUtil.create('div', 'info legend bg-white bg-opacity-90 p-3 rounded shadow');
             div.innerHTML += '<div class="flex items-center mb-2"><span style="background:blue; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>Escola A</div>';
             div.innerHTML += '<div class="flex items-center mb-2"><span style="background:green; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>Escola B</div>';
+            div.innerHTML += '<div class="flex items-center mb-2"><span style="background:purple; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>SENAC</div>';
             div.innerHTML += '<div class="flex items-center"><span style="background:red; width:16px; height:4px; display:inline-block; margin-right:8px;"></span>Escola C</div>';
             return div;
         };
