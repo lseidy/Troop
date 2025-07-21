@@ -1,0 +1,56 @@
+# Troop - Transporte Seguro e Confiável
+
+Este projeto é uma aplicação web para busca, visualização e agendamento de rotas de transporte escolar/vans, com integração ao Google Maps.
+
+## Funcionalidades
+
+- Busca de rotas disponíveis a partir do bairro ou endereço de partida.
+- Visualização das rotas no mapa, com pontos de parada destacados.
+- Cards de motoristas com detalhes do trajeto, veículo e horário.
+- Seleção de motorista e plano (diário, semanal, mensal).
+- Agendamento rápido e seguro.
+- Sugestão de bairros no campo de partida usando Google Places Autocomplete.
+
+## Tecnologias
+
+- **HTML5**
+- **Tailwind CSS** (via CDN)
+- **Google Maps JavaScript API** (com Places)
+- **JavaScript puro**
+
+## Como usar
+
+1. **Preencha o endereço de partida** (bairros sugeridos automaticamente).
+2. **Escolha a escola de destino**.
+3. Clique em **Buscar Rotas Disponíveis**.
+4. Visualize as opções de motoristas e rotas no mapa.
+5. Selecione o motorista desejado.
+6. Escolha o plano e finalize o agendamento.
+
+## Estrutura dos arquivos
+
+- `troop.html`: Página principal e todo o código da aplicação.
+- Imagens e ícones são carregados via links externos.
+
+## Configuração do Google Maps
+
+O projeto já está configurado para funcionar com a API do Google Maps.  
+Caso queira usar sua própria chave, altere o parâmetro `key` na linha:
+
+```html
+<script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_AQUI&libraries=places"></script>
+```
+
+## Personalização
+
+- Para alterar cores, fontes ou espaçamentos, edite o bloco de configuração do Tailwind no `<head>`.
+- Para adicionar ou remover motoristas, edite o array `motoristasPorRota` no `<script>`.
+
+## Observações
+
+- O projeto é apenas para fins de demonstração e não realiza agendamento real.
+- Os dados de motoristas e rotas são fictícios.
+
+---
+
+**Desenvolvido por Lucas Seidy Ikenoue
