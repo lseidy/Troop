@@ -96,15 +96,14 @@
                         <div class="grid md:grid-cols-1 gap-6">
                             <div class="relative">
                                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                <input id="partida" placeholder="Endereço de Partida" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0">
+                                <input id="partida" placeholder="Digite seu endereço (ex: Rua das Flores, 123)" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0">
                             </div>
                             <div class="relative">
                                     <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                                     <select id="destino" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 appearance-none bg-white text-troop-dark-gray">
                                         <option value="" disabled selected hidden>Escolha a escola</option>
-                                        <option value="Escola A">Escola A</option>
-                                        <option value="Escola B">Escola B</option>
-                                        <option value="Escola C">Escola C</option>
+                                        <option value="Escola de Inglês">Escola de Inglês</option>
+                                        <option value="Show (Evento)">Show (Evento)</option>
                                         <option value="SENAC">SENAC</option>
                                     </select>
                                 </div>
@@ -254,19 +253,19 @@ document.addEventListener("DOMContentLoaded", function () {
     // Dados dos motoristas por rota (removido um motorista e adicionados lugares fictícios das escolas)
     const motoristasPorRota = [
         {
-            rota: "Escola A",
+            rota: "Escola de Inglês",
             cor: "#2563eb",
             origem: { lat: -31.7654, lng: -52.3371 },
-            destino: { lat: -31.7800, lng: -52.3400 }, // Escola A fictícia
+            destino: { lat: -31.7800, lng: -52.3400 }, // Escola de Inglês fictícia
             motoristas: [
                 { nome: "João Silva", foto: "https://randomuser.me/api/portraits/men/32.jpg", veiculo: "Van Sprinter", placa: "ABC-1234" }
             ]
         },
         {
-            rota: "Escola B",
+            rota: "Show (Evento)",
             cor: "#22c55e",
             origem: { lat: -31.7654, lng: -52.3371 },
-            destino: { lat: -31.7500, lng: -52.3200 }, // Escola B fictícia
+            destino: { lat: -31.7500, lng: -52.3200 }, // Show (Evento) fictícia
             motoristas: [
                 { nome: "Carlos Lima", foto: "https://randomuser.me/api/portraits/men/65.jpg", veiculo: "Van Boxer", placa: "JKL-4321" }
             ]
@@ -288,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Google Places Autocomplete para o campo de partida
     const partidaInput = document.getElementById('partida');
     let autocomplete = new google.maps.places.Autocomplete(partidaInput, {
-        types: ['(regions)'], // Sugere bairros, regiões, sublocalidades
+        types: ['address'], // Permite endereços completos incluindo nomes de ruas
         componentRestrictions: { country: 'br' }
     });
     autocomplete.addListener('place_changed', function () {
@@ -299,8 +298,8 @@ document.addEventListener("DOMContentLoaded", function () {
             lng: place.geometry.location.lng()
         };
 
-        // Mostra o nome selecionado (bairro, região, etc) no campo de partida
-        partidaInput.value = place.name || place.formatted_address;
+        // Mostra o endereço completo selecionado no campo de partida
+        partidaInput.value = place.formatted_address;
 
         // Remove qualquer extração manual do bairro!
         let bairroDiv = document.getElementById('bairro-partida');
@@ -314,6 +313,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 lng: partidaCoords.lng + (Math.random() - 0.5) * offset
             };
         });
+
+        // Se o mapa já foi inicializado, recentra no novo endereço com zoom ideal para o círculo de 1km
+        if (map) {
+            map.setCenter(partidaCoords);
+            map.setZoom(14); // Zoom ideal para visualizar círculo de 1km
+        }
     });
 
     // Antes de renderMotoristas e inicializarMapaERotas, defina bairros fictícios:
@@ -339,6 +344,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 };
             });
             origemCustomizada = true;
+        } else {
+            // Distribui as vans em pontos distintos dentro do raio de 3km
+            const raioKm = 3;
+            const raioGraus = raioKm / 111; // Aproximadamente 1 grau = 111km
+            
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                // Calcula ângulos distintos para cada van (distribui uniformemente)
+                const angulo = (idx * (360 / motoristasPorRota.length)) * (Math.PI / 180);
+                // Varia a distância para criar mais diversidade
+                const distancia = raioGraus * (0.3 + (idx % 3) * 0.35); // Entre 30% e 95% do raio
+                
+                rotaObj.origem = {
+                    lat: partidaCoords.lat + Math.cos(angulo) * distancia,
+                    lng: partidaCoords.lng + Math.sin(angulo) * distancia
+                };
+            });
+            origemCustomizada = true;
         }
 
         motoristasPorRota.forEach((rotaObj, idx) => {
@@ -349,12 +371,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Pontos de parada reais (usados no mapa)
                 let paradas = [];
-                if (rotaObj.rota === "Escola A") {
-                    paradas.push({ nome: "Escola A", cor: rotaObj.cor });
-                    if (mIdx === 0) paradas.push({ nome: "Escola B", cor: "#22c55e" });
+                if (rotaObj.rota === "Escola de Inglês") {
+                    paradas.push({ nome: "Escola de Inglês", cor: rotaObj.cor });
+                    if (mIdx === 0) paradas.push({ nome: "Show (Evento)", cor: "#22c55e" });
                 }
-                if (rotaObj.rota === "Escola B") paradas.push({ nome: "Escola B", cor: rotaObj.cor });
-                if (rotaObj.rota === "Escola C") paradas.push({ nome: "Escola C", cor: rotaObj.cor });
+                if (rotaObj.rota === "Show (Evento)") paradas.push({ nome: "Show (Evento)", cor: rotaObj.cor });
 
                 // Detalhe do trajeto: mostra bolinhas coloridas dos pontos de parada
                 let trajeto = `Origem`;
@@ -398,20 +419,61 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cada motorista tem sua rota traçada no mapa ao clicar
     function inicializarMapaERotas() {
+        // Define o centro do mapa baseado no endereço de partida se disponível
+        const mapCenter = partidaCoords || { lat: -31.7654, lng: -52.3371 };
+        const mapZoom = partidaCoords ? 14 : 12; // Zoom ideal para ver círculo de 1km se há endereço selecionado
+        
         map = new google.maps.Map(document.getElementById("map"), {
-            center: partidaCoords || { lat: -31.7654, lng: -52.3371 },
-            zoom: 13,
+            center: mapCenter,
+            zoom: mapZoom,
         });
         directionsService = new google.maps.DirectionsService();
+
+        // Adiciona círculo de 1km de raio ao redor do endereço de partida
+        if (partidaCoords) {
+            const circle = new google.maps.Circle({
+                strokeColor: '#322275',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#322275',
+                fillOpacity: 0.1,
+                map: map,
+                center: partidaCoords,
+                radius: 1000 // 1km em metros
+            });
+            
+            // Ajusta o zoom e centro do mapa para mostrar perfeitamente o círculo de 1km
+            const bounds = circle.getBounds();
+            map.fitBounds(bounds);
+            
+            // Força um zoom específico que seja ideal para visualizar 1km de raio
+            setTimeout(() => {
+                map.setZoom(14);
+            }, 100);
+            
+            // Adiciona marcador no centro (endereço de partida)
+            new google.maps.Marker({
+                position: partidaCoords,
+                map: map,
+                title: "Seu endereço de partida",
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#322275',
+                    fillOpacity: 1,
+                    strokeColor: '#FFFFFF',
+                    strokeWeight: 3
+                }
+            });
+        }
 
         let routeRenderers = [];
         const enderecoSenac = "Rua Gonçalves Chaves, 604, Pelotas, RS";
 
         // Coordenadas fictícias das escolas
         const escolasCoords = {
-            "Escola A": { lat: -31.7800, lng: -52.3400 },
-            "Escola B": { lat: -31.7500, lng: -52.3200 },
-            "Escola C": { lat: -31.7550, lng: -52.3500 }
+            "Escola de Inglês": { lat: -31.7800, lng: -52.3400 },
+            "Show (Evento)": { lat: -31.7500, lng: -52.3200 }
         };
 
         // Se não foi selecionado endereço de partida e escola, mostra todas as rotas saindo de bairros diferentes
@@ -422,6 +484,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     lng: bairrosFicticios[idx % bairrosFicticios.length].lng
                 };
             });
+        } else {
+            // Distribui as vans em pontos distintos dentro do raio de 1km
+            const raioKm = 1;
+            const raioGraus = raioKm / 111; // Aproximadamente 1 grau = 111km
+            
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                // Calcula ângulos distintos para cada van (distribui uniformemente)
+                const angulo = (idx * (360 / motoristasPorRota.length)) * (Math.PI / 180);
+                // Varia a distância para criar mais diversidade
+                const distancia = raioGraus * (0.3 + (idx % 3) * 0.35); // Entre 30% e 95% do raio
+                
+                rotaObj.origem = {
+                    lat: partidaCoords.lat + Math.cos(angulo) * distancia,
+                    lng: partidaCoords.lng + Math.sin(angulo) * distancia
+                };
+            });
         }
 
         motoristasPorRota.forEach((rotaObj, idx) => {
@@ -429,24 +507,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 let destinoFinal = enderecoSenac;
                 let waypoints = [];
 
-                // Motorista da Escola A faz Origem -> Escola A -> SENAC
-                if (rotaObj.rota === "Escola A") {
+                // Motorista da Escola de Inglês faz Origem -> Escola de Inglês -> SENAC
+                if (rotaObj.rota === "Escola de Inglês") {
                     waypoints.push({
-                        location: escolasCoords["Escola A"],
+                        location: escolasCoords["Escola de Inglês"],
                         stopover: true
                     });
                 }
-                // Motorista da Escola B faz Origem -> Escola B -> SENAC
-                if (rotaObj.rota === "Escola B") {
+                // Motorista do Show (Evento) faz Origem -> Show (Evento) -> SENAC
+                if (rotaObj.rota === "Show (Evento)") {
                     waypoints.push({
-                        location: escolasCoords["Escola B"],
-                        stopover: true
-                    });
-                }
-                // Motorista da Escola C faz Origem -> Escola C -> SENAC
-                if (rotaObj.rota === "Escola C") {
-                    waypoints.push({
-                        location: escolasCoords["Escola C"],
+                        location: escolasCoords["Show (Evento)"],
                         stopover: true
                     });
                 }
@@ -469,6 +540,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 routeRenderers.push(renderer);
 
+                // Adiciona marcador na origem da van
+                new google.maps.Marker({
+                    position: rotaObj.origem,
+                    map: map,
+                    title: `Van de ${motorista.nome} - ${rotaObj.rota}`,
+                    icon: {
+                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                        scale: 6,
+                        fillColor: rotaObj.cor,
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2
+                    }
+                });
+
                 directionsService.route({
                     origin: rotaObj.origem,
                     destination: destinoFinal,
@@ -482,18 +568,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         // Adiciona marcadores para cada parada (waypoint)
                         waypoints.forEach((wp, i) => {
+                            // Determina o nome da parada baseado nas coordenadas
+                            let nomeParada = 'Escola';
+                            for (const [nome, coords] of Object.entries(escolasCoords)) {
+                                if (Math.abs(coords.lat - wp.location.lat) < 0.001 && 
+                                    Math.abs(coords.lng - wp.location.lng) < 0.001) {
+                                    nomeParada = nome;
+                                    break;
+                                }
+                            }
+                            
                             new google.maps.Marker({
                                 position: wp.location,
                                 map: map,
                                 icon: {
                                     path: google.maps.SymbolPath.CIRCLE,
-                                    scale: 8,
+                                    scale: 12,
                                     fillColor: rotaObj.cor,
-                                    fillOpacity: 1,
-                                    strokeColor: "#333333", // cor da borda
-                                    strokeWeight: 2
+                                    fillOpacity: 0.9,
+                                    strokeColor: "#FFFFFF",
+                                    strokeWeight: 3
                                 },
-                                title: `Parada: ${Object.keys(escolasCoords).find(k => escolasCoords[k].lat === wp.location.lat && escolasCoords[k].lng === wp.location.lng) || 'Escola'}`
+                                title: `Parada: ${nomeParada}`,
+                                label: {
+                                    text: String(i + 1),
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold'
+                                }
+                            });
+                            
+                            // Adiciona InfoWindow com informações da parada
+                            const infoWindow = new google.maps.InfoWindow({
+                                content: `
+                                    <div style="padding: 8px;">
+                                        <h3 style="margin: 0; color: ${rotaObj.cor}; font-weight: bold;">${nomeParada}</h3>
+                                        <p style="margin: 4px 0; font-size: 12px;">Parada ${i + 1} da rota</p>
+                                        <p style="margin: 4px 0; font-size: 12px;">Motorista: ${motorista.nome}</p>
+                                        <p style="margin: 4px 0; font-size: 12px;">Veículo: ${motorista.veiculo}</p>
+                                    </div>
+                                `
+                            });
+                            
+                            // Cria o marcador da parada
+                            const paradaMarker = new google.maps.Marker({
+                                position: wp.location,
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: rotaObj.cor,
+                                    fillOpacity: 0.9,
+                                    strokeColor: "#FFFFFF",
+                                    strokeWeight: 3
+                                },
+                                title: `Parada: ${nomeParada}`,
+                                label: {
+                                    text: String(i + 1),
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold'
+                                }
+                            });
+                            
+                            // Adiciona evento de clique para mostrar InfoWindow
+                            paradaMarker.addListener('click', function() {
+                                infoWindow.open(map, paradaMarker);
                             });
                         });
                     }
@@ -504,11 +644,41 @@ document.addEventListener("DOMContentLoaded", function () {
                     const geocoder = new google.maps.Geocoder();
                     geocoder.geocode({ address: enderecoSenac }, function(results, status) {
                         if (status === "OK" && results[0]) {
-                            new google.maps.Marker({
+                            const senacMarker = new google.maps.Marker({
                                 position: results[0].geometry.location,
                                 map: map,
-                                label: "D",
-                                title: "Destino SENAC"
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 15,
+                                    fillColor: '#ff6b35',
+                                    fillOpacity: 1,
+                                    strokeColor: '#FFFFFF',
+                                    strokeWeight: 3
+                                },
+                                title: "Destino Final: SENAC",
+                                label: {
+                                    text: 'D',
+                                    color: '#FFFFFF',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold'
+                                }
+                            });
+                            
+                            // InfoWindow para o destino SENAC
+                            const senacInfoWindow = new google.maps.InfoWindow({
+                                content: `
+                                    <div style="padding: 8px;">
+                                        <h3 style="margin: 0; color: #ff6b35; font-weight: bold;">SENAC</h3>
+                                        <p style="margin: 4px 0; font-size: 12px;">Destino Final</p>
+                                        <p style="margin: 4px 0; font-size: 12px;">Todas as rotas chegam aqui</p>
+                                        <p style="margin: 4px 0; font-size: 10px; color: #666;">${enderecoSenac}</p>
+                                    </div>
+                                `
+                            });
+                            
+                            // Evento de clique para mostrar InfoWindow do SENAC
+                            senacMarker.addListener('click', function() {
+                                senacInfoWindow.open(map, senacMarker);
                             });
                         }
                     });
