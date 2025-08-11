@@ -32,6 +32,14 @@ Este projeto é uma aplicação web para busca, visualização e agendamento de 
 - `troop.html`: Página principal e todo o código da aplicação.
 - Imagens e ícones são carregados via links externos.
 
+## Imagem da Primeira Aba
+
+![Primeira aba do Troop](./Imagem_Demo.png)
+
+## Imagem da Aba de Seleção de Rota
+
+![Aba de seleção de rota do Troop](./Imagem_Mapa.png)
+
 ## Configuração do Google Maps
 
 O projeto já está configurado para funcionar com a API do Google Maps.  
