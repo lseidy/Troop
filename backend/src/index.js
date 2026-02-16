@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth.js';
+import routeRoutes from './routes/routeRoutes.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -50,6 +51,9 @@ app.get('/health', async (req, res) => {
 
 // Auth routes
 app.use('/auth', authRoutes);
+
+// Route routes (van management)
+app.use('/routes', routeRoutes);
 
 // 404 handler
 app.use((req, res) => {
