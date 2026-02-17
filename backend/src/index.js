@@ -12,9 +12,14 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+// Configure CORS to allow the frontend to call this API. Use `FRONTEND_URL` env var if provided.
+const corsOrigin = process.env.FRONTEND_URL || '*';
+const corsOptions = { origin: corsOrigin, credentials: true };
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+console.log(`CORS configured. Allowed origin: ${corsOrigin}`);
 
 // Logging middleware
 app.use((req, res, next) => {
