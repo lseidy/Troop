@@ -45,6 +45,7 @@ model Booking {
   id        Int       @id @default(autoincrement())
   userId    Int
   routeId   Int
+  status    String    @default("CONFIRMED")
   createdAt DateTime  @default(now())
 
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)

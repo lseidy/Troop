@@ -8,16 +8,16 @@ const prisma = new PrismaClient();
  * Espera no body: origin, destination, departureAt, seatCapacity, published? (opcional)
  * Usa `req.user.id` como driverId
  */
-export async function createRoute(req, res) {
+export async function createRoute(req, res, next) {
   try {
     const driverId = req.user && req.user.id;
     if (!driverId) {
       return res.status(401).json({ error: 'Driver not authenticated' });
     }
 
-    const { origin, destination, departureAt, seatCapacity, published } = req.body;
+    const { origin, destination, departureAt, seatCapacity, published, price } = req.body;
 
-    if (!origin || !destination || !departureAt || !seatCapacity) {
+    if (!origin || !destination || !departureAt || typeof seatCapacity === 'undefined') {
       return res.status(400).json({ error: 'origin, destination, departureAt and seatCapacity are required' });
     }
 
@@ -25,13 +25,30 @@ export async function createRoute(req, res) {
     if (Number.isNaN(departure.getTime())) {
       return res.status(400).json({ error: 'Invalid departureAt date' });
     }
+    const now = new Date();
+    if (departure.getTime() <= now.getTime()) {
+      return res.status(400).json({ error: 'departureAt must be a future date' });
+    }
+
+    const capacityNum = Number(seatCapacity);
+    if (Number.isNaN(capacityNum) || capacityNum <= 0) {
+      return res.status(400).json({ error: 'seatCapacity must be a positive number' });
+    }
+
+    if (typeof price !== 'undefined') {
+      const priceNum = Number(price);
+      if (Number.isNaN(priceNum) || priceNum < 0) {
+        return res.status(400).json({ error: 'price must be a non-negative number' });
+      }
+      // Note: model doesn't store price; we only validate if provided
+    }
 
     const route = await prisma.vanRoute.create({
       data: {
         origin,
         destination,
         departureAt: departure,
-        seatCapacity: Number(seatCapacity),
+        seatCapacity: capacityNum,
         published: typeof published === 'boolean' ? published : false,
         driver: { connect: { id: driverId } }
       }
@@ -41,7 +58,7 @@ export async function createRoute(req, res) {
 
   } catch (error) {
     console.error('Erro ao criar rota:', error);
-    return res.status(500).json({ error: 'Erro ao criar rota' });
+    return next ? next(error) : res.status(500).json({ error: 'Erro ao criar rota' });
   }
 }
 
@@ -117,5 +134,23 @@ export async function listRoutes(req, res) {
   } catch (error) {
     console.error('Erro ao listar rotas:', error);
     return res.status(500).json({ error: 'Erro ao listar rotas' });
+  }
+}
+
+export async function getDriverRoutes(req, res, next) {
+  try {
+    const driverId = req.user && req.user.id;
+    if (!driverId) return res.status(401).json({ error: 'Usuário não autenticado' });
+
+    const routes = await prisma.vanRoute.findMany({
+      where: { driverId: Number(driverId) },
+      include: { _count: { select: { bookings: true } } },
+      orderBy: { departureAt: 'desc' }
+    });
+
+    return res.status(200).json({ routes });
+  } catch (error) {
+    console.error('Erro ao obter rotas do motorista:', error);
+    return next ? next(error) : res.status(500).json({ error: 'Erro ao obter rotas do motorista' });
   }
 }

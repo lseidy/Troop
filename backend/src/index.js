@@ -4,6 +4,8 @@ import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth.js';
 import routeRoutes from './routes/routeRoutes.js';
+import bookingRoutes from './routes/bookingRoutes.js';
+import errorMiddleware from './middleware/errorMiddleware.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -55,21 +57,17 @@ app.use('/auth', authRoutes);
 // Route routes (van management)
 app.use('/routes', routeRoutes);
 
+// Bookings routes
+app.use('/bookings', bookingRoutes);
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ 
     error: 'Rota não encontrada' 
   });
 });
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Erro não tratado:', err);
-  res.status(500).json({ 
-    error: 'Erro interno do servidor',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+// Global error handler
+app.use(errorMiddleware);
 
 // Start server
 async function startServer() {

@@ -91,6 +91,15 @@ if [ "$CREATE_CODE" = "201" ]; then
 else
   echo "Failed to create route as driver ($CREATE_CODE):"; echo "$CREATE_BODY"; exit 1;
 fi
+# Extract route id and seat capacity
+if [ "$PARSER" = "jq" ]; then
+  ROUTE_ID=$(echo "$CREATE_BODY" | jq -r '.route.id // .id')
+  SEAT_CAPACITY=$(echo "$CREATE_BODY" | jq -r '.route.seatCapacity // .seatCapacity')
+else
+  ROUTE_ID=$(echo "$CREATE_BODY" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('route',{}).get('id',d.get('id','')))")
+  SEAT_CAPACITY=$(echo "$CREATE_BODY" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('route',{}).get('seatCapacity',d.get('seatCapacity',0)))")
+fi
+echo "Route id: $ROUTE_ID, seatCapacity: $SEAT_CAPACITY"
 
 echo "[5/9] Registering PASSENGER: $PASS_EMAIL"
 REGP_RESPONSE=$(http_post "$BASE_URL/auth/register" "{\"name\":\"Paulo Passageiro\",\"email\":\"$PASS_EMAIL\",\"password\":\"$PASS_PASS\",\"role\":\"PASSENGER\"}")
@@ -130,6 +139,101 @@ if [ "$CREP_CODE" = "403" ]; then
   echo "Passenger correctly blocked from creating route.";
 else
   echo "Passenger route creation did NOT return 403 (got $CREP_CODE). Response:"; echo "$CREP_BODY"; exit 1;
+fi
+
+echo "[BOOKING-1] Passenger books the route (should succeed: 201)"
+BOOK_RESP=$(curl -s -o - -w "\n%{http_code}" -X POST "$BASE_URL/bookings" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN_PASS" \
+  -d "{\"routeId\":$ROUTE_ID}")
+BOOK_BODY=$(echo "$BOOK_RESP" | sed '$d')
+BOOK_CODE=$(echo "$BOOK_RESP" | tail -n1)
+echo "Booking status: $BOOK_CODE"
+if [ "$BOOK_CODE" = "201" ]; then
+  echo "Booking created for passenger.";
+else
+  echo "Failed to create booking as passenger ($BOOK_CODE):"; echo "$BOOK_BODY"; exit 1;
+fi
+
+echo "[BOOKING-2] Same passenger tries to book same route again (should be blocked: 409)"
+BOOK2_RESP=$(curl -s -o - -w "\n%{http_code}" -X POST "$BASE_URL/bookings" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN_PASS" \
+  -d "{\"routeId\":$ROUTE_ID}")
+BOOK2_BODY=$(echo "$BOOK2_RESP" | sed '$d')
+BOOK2_CODE=$(echo "$BOOK2_RESP" | tail -n1)
+echo "Second booking status: $BOOK2_CODE"
+if [ "$BOOK2_CODE" = "409" ]; then
+  echo "Duplicate booking correctly blocked.";
+else
+  echo "Duplicate booking test failed (expected 409, got $BOOK2_CODE). Response:"; echo "$BOOK2_BODY"; exit 1;
+fi
+
+echo "[BOOKING-3] Fill capacity with different passengers, then expect 400 on extra booking"
+# Determine effective capacity (min(SEAT_CAPACITY,16))
+if [ -z "$SEAT_CAPACITY" ] || [ "$SEAT_CAPACITY" -le 0 ] 2>/dev/null; then
+  EFFECTIVE_CAP=16
+else
+  if [ "$SEAT_CAPACITY" -gt 16 ] 2>/dev/null; then
+    EFFECTIVE_CAP=16
+  else
+    EFFECTIVE_CAP=$SEAT_CAPACITY
+  fi
+fi
+echo "Effective capacity: $EFFECTIVE_CAP"
+# We already have 1 booking from passenger_$TIMESTAMP, so create EFFECTIVE_CAP-1 more bookings
+TO_CREATE=$((EFFECTIVE_CAP-1))
+if [ "$TO_CREATE" -lt 0 ]; then TO_CREATE=0; fi
+echo "Creating $TO_CREATE additional passenger bookings to fill the van"
+for i in $(seq 1 $TO_CREATE); do
+  P_EMAIL="p_${TIMESTAMP}_$i@example.com"
+  P_PASS="pw${i}pass123"
+  # register
+  RSP=$(http_post "$BASE_URL/auth/register" "{\"name\":\"P$i\",\"email\":\"$P_EMAIL\",\"password\":\"$P_PASS\",\"role\":\"PASSENGER\"}")
+  RBODY=$(echo "$RSP" | sed '$d')
+  RCODE=$(echo "$RSP" | tail -n1)
+  if [ "$RCODE" != "201" ] && [ "$RCODE" != "409" ]; then
+    echo "Failed to register P$i ($RCODE): $RBODY"; exit 1;
+  fi
+  # login
+  LRES=$(http_post "$BASE_URL/auth/login" "{\"email\":\"$P_EMAIL\",\"password\":\"$P_PASS\"}")
+  LBODY=$(echo "$LRES" | sed '$d')
+  LCODE=$(echo "$LRES" | tail -n1)
+  if [ "$LCODE" != "200" ]; then echo "Login failed for $P_EMAIL ($LCODE): $LBODY"; exit 1; fi
+  if [ "$PARSER" = "jq" ]; then
+    PTOKEN=$(echo "$LBODY" | jq -r '.token // empty')
+  else
+    PTOKEN=$(echo "$LBODY" | python3 -c "import sys,json;print(json.load(sys.stdin).get('token',''))")
+  fi
+  if [ -z "$PTOKEN" ]; then echo "Failed to extract token for $P_EMAIL"; exit 1; fi
+  # book
+  BRES=$(curl -s -o - -w "\n%{http_code}" -X POST "$BASE_URL/bookings" -H "Content-Type: application/json" -H "Authorization: Bearer $PTOKEN" -d "{\"routeId\":$ROUTE_ID}")
+  BBODY=$(echo "$BRES" | sed '$d')
+  BCODE=$(echo "$BRES" | tail -n1)
+  if [ "$BCODE" != "201" ]; then echo "Failed to create booking for $P_EMAIL ($BCODE): $BBODY"; exit 1; fi
+done
+
+# Now attempt one more booking with a fresh passenger and expect 400
+EX_EMAIL="extra_${TIMESTAMP}@example.com"
+EX_PASS="extrapk"
+http_post "$BASE_URL/auth/register" "{\"name\":\"Extra\",\"email\":\"$EX_EMAIL\",\"password\":\"$EX_PASS\",\"role\":\"PASSENGER\"}" >/dev/null
+LRES=$(http_post "$BASE_URL/auth/login" "{\"email\":\"$EX_EMAIL\",\"password\":\"$EX_PASS\"}")
+LBODY=$(echo "$LRES" | sed '$d')
+LCODE=$(echo "$LRES" | tail -n1)
+if [ "$LCODE" != "200" ]; then echo "Login failed for extra passenger ($LCODE): $LBODY"; exit 1; fi
+if [ "$PARSER" = "jq" ]; then
+  EXTOKEN=$(echo "$LBODY" | jq -r '.token // empty')
+else
+  EXTOKEN=$(echo "$LBODY" | python3 -c "import sys,json;print(json.load(sys.stdin).get('token',''))")
+fi
+EBRES=$(curl -s -o - -w "\n%{http_code}" -X POST "$BASE_URL/bookings" -H "Content-Type: application/json" -H "Authorization: Bearer $EXTOKEN" -d "{\"routeId\":$ROUTE_ID}")
+EBODY=$(echo "$EBRES" | sed '$d')
+ECODE=$(echo "$EBRES" | tail -n1)
+echo "Extra booking attempt status: $ECODE"
+if [ "$ECODE" = "400" ]; then
+  echo "Van correctly reported as full (400).";
+else
+  echo "Expected 400 when booking full van, got $ECODE. Response:"; echo "$EBODY"; exit 1;
 fi
 
 echo "[8/9] Searching for routes by destination 'UFPel' (should find at least 1)"
