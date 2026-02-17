@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troop - Transporte Seguro e Confiável</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles & Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'troop-purple': '#322275',
+                        'troop-light-gray': '#F5F5F5',
+                        'troop-dark-gray': '#333333',
+                        'troop-white': '#FFFFFF',
+                        'muted': '#E5E7EB',
+                        'muted-foreground': '#6B7280',
+                    },
+                    fontFamily: {
+                        'lato': ['Lato', 'sans-serif'],
+                        'horizon': ['Audiowide', 'cursive'],
+                    },
+                    boxShadow: {
+                        'strong': '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
+                    },
+                    height: {
+                        '128': '32rem', // 512px
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bg-gradient-overlay {
+            /* Overlay com transparência ajustada para tornar a imagem mais visível */
+            background-image: linear-gradient(to top, rgba(50, 34, 117, 0.75) 0%, rgba(50, 34, 117, 0.3) 60%, rgba(50, 34, 117, 0.1) 100%);
+        }
+        /* For date input placeholder */
+        input[type="date"]:not(:valid):before {
+            content: attr(placeholder);
+            color: #6B7280;
+        }
+    </style>
+    <!-- API do Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu47mjnadIRWMqFq1lPw_qEBz6Ns3Ic7s&libraries=places"></script>
+</head>
+<body class="font-lato bg-troop-white text-troop-dark-gray">
+
+    <!-- Header -->
+    <header class="absolute top-0 left-0 right-0 z-50 bg-transparent">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-4">
+                <div class="relative flex items-center justify-center h-14 w-14 md:h-16 md:w-16 bg-troop-white/90 rounded-2xl shadow-2xl">
+                    <img src="https://img.icons8.com/?size=100&id=QTQ1x0Wu6rnn&format=png&color=000000" alt="Van Escolar" class="h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow-xl" />
+                </div>
+                <span class="font-horizon font-black text-3xl md:text-4xl text-troop-white drop-shadow-xl tracking-wide hidden sm:inline">Troop</span>
+            </div>
+            <!-- Navigation -->
+            <div class="hidden md:flex items-center">
+                <a href="#" class="ml-2 bg-gradient-to-r from-troop-white/80 to-troop-purple/30 border border-troop-white/40 text-troop-purple hover:bg-troop-white hover:text-troop-purple font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 text-base scale-105">Login</a>
+            </div>
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center">
+                <button class="p-2 rounded-full bg-troop-white/20 hover:bg-troop-white/40 transition shadow-lg border border-troop-white/30 flex items-center justify-center" aria-label="Abrir menu">
+                    <svg class="h-7 w-7 text-troop-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16"/></svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+        <!-- Hero Section: aumente o layout da primeira página -->
+<section class="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-16 pb-10">
+    <!-- Background Image (van escolar) com blur -->
+    <div class="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[2px] bg-[url('https://przewozosobnysa.pl/wp-content/uploads/2024/06/ludzie-wchodzacy-do-busa.jpg')]"></div>
+    <!-- Overlay para transparência e cor troop-purple mais forte -->
+    <div class="absolute inset-0 bg-gradient-to-tr from-troop-purple/80 via-troop-purple/60 to-troop-purple/30"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 container mx-auto px-10">
+        <div id="etapa-1">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+                <!-- Card com campos (lado esquerdo) -->
+                <div class="bg-troop-white/95 backdrop-blur-sm shadow-strong border-0 p-10 md:p-16 rounded-3xl">
+                    <div class="space-y-6 mb-10">
+                        <div class="grid md:grid-cols-1 gap-6">
+                            <div class="relative">
+                                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <input id="partida" placeholder="Digite seu endereço (ex: Rua das Flores, 123)" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0">
+                            </div>
+                            <div class="relative">
+                                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <select id="destino" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 appearance-none bg-white text-troop-dark-gray">
+                                        <option value="" disabled selected hidden>Escolha a escola</option>
+                                        <option value="Escola de Inglês">Escola de Inglês</option>
+                                        <option value="Show (Evento)">Show (Evento)</option>
+                                        <option value="SENAC">SENAC</option>
+                                    </select>
+                                </div>
+                                <!-- Third field removed as requested -->
+                            </div>
+                        </div>
+                        <button id="btn-etapa-1" class="w-full bg-troop-purple text-troop-white font-bold py-2 px-4 rounded-lg shadow-lg transform hover:scale-105 flex items-center justify-center text-base transition-all duration-300 hover:shadow-xl">
+                            <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            BUSCAR ROTAS DISPONÍVEIS
+                        </button>
+                    </div>
+                    <!-- Título (lado direito) -->
+                    <div class="text-right md:pl-4">
+                        <h1 class="font-lato font-black text-3xl md:text-4xl text-troop-white mb-8 md:mb-12 leading-relaxed md:leading-[1.2] tracking-normal md:tracking-wide drop-shadow-lg">
+                            O transporte para suas atividades,<br>
+                            <span class="inline-block mt-4 mb-4"></span>
+                            com a <span class="text-troop-purple bg-troop-white/80 px-2 rounded">segurança e confiança</span><br>
+                            <span class="inline-block mt-4 mb-4"></span>
+                            que você precisa.
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            <div id="etapa-2" class="hidden">
+                <!-- Section do mapa + cards de motoristas -->
+                <section class="py-10 bg-troop-white">
+                    <div class="container mx-auto px-6 text-center">
+                        <h2 class="font-horizon text-3xl md:text-4xl text-troop-dark-gray mb-4">Escolha sua rota e motorista</h2>
+                        <div class="relative rounded-xl overflow-hidden shadow-lg h-96 lg:h-128 mb-8">
+                            <div id="map" class="w-full h-full"></div>
+                            <div class="absolute inset-0 pointer-events-none"></div>
+                        </div>
+                        <div id="motoristas-cards" class="grid md:grid-cols-3 gap-6 mt-8"></div>
+                    </div>
+                </section>
+            </div>
+            <div id="etapa-3" class="hidden">
+                <!-- Confirmação/agendamento -->
+                <div class="max-w-xl mx-auto bg-troop-white rounded-xl shadow-lg p-8 text-center">
+                    <h2 class="font-horizon text-3xl text-troop-dark-gray mb-4">Confirmação</h2>
+                    <p class="mb-6">Sua rota foi selecionada! Complete o agendamento abaixo.</p>
+                    <!-- Adicione campos de confirmação/agendamento conforme necessário -->
+                    <button class="bg-troop-purple text-troop-white font-bold py-3 px-6 rounded-lg shadow-lg mt-4">Finalizar Agendamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <main>
+        <!-- How It Works Section -->
+        <section id="como-funciona" class="py-3 bg-troop-light-gray">
+    <div class="container mx-auto px-2 text-center">
+        <h2 class="font-horizon text-xl md:text-2xl text-troop-dark-gray mb-2">Simples, Rápido e Confiável</h2>
+        <p class="max-w-md mx-auto text-muted-foreground mb-4 text-sm">Em apenas três passos você organiza seu transporte com total segurança.</p>
+        <div class="grid md:grid-cols-3 gap-3">
+            <div class="flex flex-col items-center p-2 rounded-md">
+                <div class="bg-troop-purple/10 text-troop-purple p-2 rounded-full mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <h3 class="font-bold text-base mb-1">1. Busque o trajeto ideal</h3>
+                <p class="text-muted-foreground text-xs">Encontre a rota perfeita para suas necessidades.</p>
+            </div>
+            <div class="flex flex-col items-center p-2 rounded-md">
+                <div class="bg-troop-purple/10 text-troop-purple p-2 rounded-full mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                </div>
+                <h3 class="font-bold text-base mb-1">2. Escolha o melhor plano</h3>
+                <p class="text-muted-foreground text-xs">Selecione entre opções diárias, semanais ou mensais.</p>
+            </div>
+            <div class="flex flex-col items-center p-2 rounded-md">
+                <div class="bg-troop-purple/10 text-troop-purple p-2 rounded-full mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3 class="font-bold text-base mb-1">3. Agende com segurança</h3>
+                <p class="text-muted-foreground text-xs">Confirme sua viagem com total tranquilidade.</p>
+            </div>
+        </div>
+    </div>
+</section>
+        <!-- Pricing Section -->
+        <section id="planos" class="py-20 bg-troop-light-gray hidden">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="font-horizon text-3xl md:text-4xl text-troop-dark-gray mb-4">Planos feitos para a sua rotina</h2>
+                <p class="max-w-2xl mx-auto text-muted-foreground mb-12">Escolha o plano que melhor se adequa às suas necessidades e economize.</p>
+                <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Plano Diário -->
+                    <div class="bg-troop-white rounded-xl shadow-lg p-8 flex flex-col text-left transition-transform hover:-translate-y-2">
+                        <h3 class="font-horizon text-2xl mb-2">Diário</h3>
+                        <p class="text-muted-foreground mb-6">Perfeito para uso esporádico.</p>
+                        <p class="text-4xl font-bold mb-1">R$25<span class="text-lg font-normal text-muted-foreground">/dia</span></p>
+                        <ul class="space-y-3 text-troop-dark-gray my-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Viagem ida e volta</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Suporte durante a viagem</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Seguro incluído</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Flexibilidade total</li>
+                        </ul>
+                        <a href="#" class="selecionar-plano w-full text-center bg-troop-purple/10 text-troop-purple font-bold py-3 px-4 rounded-lg hover:bg-troop-purple/20 transition-colors">Selecionar</a>
+                    </div>
+                    <!-- Plano Mensal (Destaque) -->
+                    <div class="bg-troop-purple text-troop-white rounded-xl shadow-strong p-8 flex flex-col text-left transition-transform hover:-translate-y-2 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 m-2 bg-troop-white/20 text-troop-white text-xs font-bold px-3 py-1 rounded-full">Melhor Custo-Benefício</div>
+                        <h3 class="font-horizon text-2xl mb-2">Mensal</h3>
+                        <p class="text-troop-white/80 mb-6">Melhor custo-benefício.</p>
+                        <p class="text-4xl font-bold mb-1">R$380<span class="text-lg font-normal text-troop-white/80">/mês</span></p>
+                        <ul class="space-y-3 my-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Viagens ilimitadas</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Suporte VIP 24/7</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Seguro premium+</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Desconto de 50%</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Prioridade na reserva</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>App exclusivo</li>
+                        </ul>
+                        <a href="#" class="selecionar-plano w-full text-center bg-troop-white text-troop-purple font-bold py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors">Escolher Plano</a>
+                    </div>
+                    <!-- Plano Semanal -->
+                    <div class="bg-troop-white rounded-xl shadow-lg p-8 flex flex-col text-left transition-transform hover:-translate-y-2">
+                        <div class="absolute top-0 right-0 m-4 bg-troop-purple/10 text-troop-purple text-xs font-bold px-3 py-1 rounded-full">Economia</div>
+                        <h3 class="font-horizon text-2xl mb-2">Semanal</h3>
+                        <p class="text-muted-foreground mb-6">Economia para uso regular.</p>
+                        <p class="text-4xl font-bold mb-1">R$120<span class="text-lg font-normal text-muted-foreground">/semana</span></p>
+                        <ul class="space-y-3 text-troop-dark-gray my-8 flex-grow">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Todas as viagens da semana</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Suporte prioritário</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Seguro premium</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Desconto de 30%</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Flexibilidade de horários</li>
+                        </ul>
+                        <a href="#" class="selecionar-plano w-full text-center bg-troop-purple/10 text-troop-purple font-bold py-3 px-4 rounded-lg hover:bg-troop-purple/20 transition-colors">Selecionar</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-troop-dark-gray text-troop-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-3 gap-8 text-center md:text-left">
+                <div class="flex flex-col items-center md:items-start">
+                    <div class="flex items-center space-x-3 mb-4">
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Dados dos motoristas por rota (removido um motorista e adicionados lugares fictícios das escolas)
+    const motoristasPorRota = [
+        {
+            rota: "Escola de Inglês",
+            cor: "#2563eb",
+            origem: { lat: -31.7654, lng: -52.3371 },
+            destino: { lat: -31.7800, lng: -52.3400 }, // Escola de Inglês fictícia
+            motoristas: [
+                { nome: "João Silva", foto: "https://randomuser.me/api/portraits/men/32.jpg", veiculo: "Van Sprinter", placa: "ABC-1234" }
+            ]
+        },
+        {
+            rota: "Show (Evento)",
+            cor: "#22c55e",
+            origem: { lat: -31.7654, lng: -52.3371 },
+            destino: { lat: -31.7500, lng: -52.3200 }, // Show (Evento) fictícia
+            motoristas: [
+                { nome: "Carlos Lima", foto: "https://randomuser.me/api/portraits/men/65.jpg", veiculo: "Van Boxer", placa: "JKL-4321" }
+            ]
+        },
+        {
+            rota: "SENAC",
+            cor: "#a21caf",
+            origem: { lat: -31.7616, lng: -52.3867 },
+            destino: { lat: -31.77019, lng: -52.34177 }, // SENAC fictício (será sobrescrito)
+            motoristas: [
+                { nome: "Fernanda Alves", foto: "https://randomuser.me/api/portraits/women/50.jpg", veiculo: "Van Renault Master", placa: "SEN-2025" }
+            ]
+        }
+    ];
+
+    let partidaCoords = null;
+    let map, marker, directionsService, directionsRenderer, polylines = [];
+
+    // CEP detection removed; destination options are populated based on the `partida` field.
+
+    // Google Places Autocomplete para o campo de partida
+    const partidaInput = document.getElementById('partida');
+    let autocomplete = new google.maps.places.Autocomplete(partidaInput, {
+        types: ['address'], // Permite endereços completos incluindo nomes de ruas
+        componentRestrictions: { country: 'br' }
+    });
+    autocomplete.addListener('place_changed', function () {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+        partidaCoords = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+        };
+
+        // Mostra o endereço completo selecionado no campo de partida
+        partidaInput.value = place.formatted_address;
+
+        // Remove qualquer extração manual do bairro!
+        let bairroDiv = document.getElementById('bairro-partida');
+        if (bairroDiv) bairroDiv.remove();
+
+        // Atualiza as origens das vans para ficarem próximas ao endereço de partida
+        motoristasPorRota.forEach((rotaObj, idx) => {
+            const offset = 0.003 + idx * 0.0015;
+            rotaObj.origem = {
+                lat: partidaCoords.lat + (Math.random() - 0.5) * offset,
+                lng: partidaCoords.lng + (Math.random() - 0.5) * offset
+            };
+        });
+
+        // Se o mapa já foi inicializado, recentra no novo endereço com zoom ideal para o círculo de 1km
+        if (map) {
+            map.setCenter(partidaCoords);
+            map.setZoom(14); // Zoom ideal para visualizar círculo de 1km
+        }
+        // After selecting a place, update destination options from backend by city
+        updateDestinoOptions().catch(err => console.error('Erro atualizando destinos:', err));
+    });
+
+    // Utility: calcula distância (km) entre dois pontos
+    function haversineKm(a, b) {
+        function toRad(x) { return x * Math.PI / 180; }
+        const R = 6371; // km
+        const dLat = toRad(b.lat - a.lat);
+        const dLon = toRad(b.lng - a.lng);
+        const lat1 = toRad(a.lat);
+        const lat2 = toRad(b.lat);
+        const sinDlat = Math.sin(dLat/2);
+        const sinDlon = Math.sin(dLon/2);
+        const aa = sinDlat*sinDlat + Math.cos(lat1)*Math.cos(lat2)*sinDlon*sinDlon;
+        const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1-aa));
+        return R * c;
+    }
+
+    // Geocodifica um endereço em coordenadas (Promise)
+    function geocodeAddress(address) {
+        return new Promise((resolve) => {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    const loc = results[0].geometry.location;
+                    resolve({ lat: loc.lat(), lng: loc.lng() });
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    }
+
+    // Get city/locality from an address using Google Geocoder (returns string or null)
+    function getCityFromAddress(address) {
+        return new Promise((resolve) => {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address }, function(results, status) {
+                if (status === 'OK' && results && results.length) {
+                    for (const r of results) {
+                        for (const comp of r.address_components) {
+                            if (comp.types.includes('locality') || comp.types.includes('administrative_area_level_2')) {
+                                resolve(comp.long_name);
+                                return;
+                            }
+                        }
+                    }
+                }
+                resolve(null);
+            });
+        });
+    }
+
+    // Fetch routes from backend where origin or destination contains the city.
+    async function fetchRoutesByCity(city) {
+        console.log('[troop] fetchRoutesByCity called with city:', city);
+        if (!city) return [];
+        try {
+            const results = [];
+            // Try using API helper if available
+            if (window.troopApi && typeof window.troopApi.fetchRoutes === 'function') {
+                // origin
+                const a = await window.troopApi.fetchRoutes({ origin: city, published: true });
+                // destination
+                const b = await window.troopApi.fetchRoutes({ destination: city, published: true });
+                if (a && a.routes) results.push(...a.routes);
+                else if (Array.isArray(a)) results.push(...a);
+                if (b && b.routes) results.push(...b.routes);
+                else if (Array.isArray(b)) results.push(...b);
+            } else {
+                const enc = encodeURIComponent(city);
+                const a = await fetch(`/routes?origin=${enc}&published=true`);
+                const ar = await a.json();
+                if (ar && ar.routes) results.push(...ar.routes);
+                else if (Array.isArray(ar)) results.push(...ar);
+                const d = await fetch(`/routes?destination=${enc}&published=true`);
+                const dr = await d.json();
+                if (dr && dr.routes) results.push(...dr.routes);
+                else if (Array.isArray(dr)) results.push(...dr);
+            }
+            // Deduplicate by id or by origin+destination+departureAt
+            const seen = new Map();
+            results.forEach(r => {
+                const key = r.id ? String(r.id) : `${r.origin}|${r.destination}|${r.departureAt}`;
+                if (!seen.has(key)) seen.set(key, r);
+            });
+            console.log('[troop] fetchRoutesByCity results count:', results.length);
+            return Array.from(seen.values());
+        } catch (err) {
+            console.error('Erro ao buscar rotas por cidade:', err);
+            return [];
+        }
+    }
+
+    // Atualiza opções do select `destino` usando rotas vindas do backend
+    async function updateDestinoOptions() {
+        const select = document.getElementById('destino');
+        const partidaVal = partidaInput.value && partidaInput.value.trim();
+        // preserve current selection so we can restore it after repopulating
+        const prevValue = select.value || null;
+        select.innerHTML = '';
+
+        if (!partidaVal) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.disabled = true;
+            opt.selected = true;
+            opt.textContent = 'Insira um endereço no campo anterior';
+            select.appendChild(opt);
+            return;
+        }
+
+        // determine city from the selected place (if available) or geocode the address
+        let city = null;
+        try {
+            // If autocomplete produced a Place, attempt to extract city from its components
+            const place = autocomplete.getPlace && autocomplete.getPlace();
+            if (place && place.address_components) {
+                for (const comp of place.address_components) {
+                    if (comp.types.includes('locality') || comp.types.includes('administrative_area_level_2')) {
+                        city = comp.long_name; break;
+                    }
+                }
+            }
+        } catch (e) { /* ignore */ }
+
+        if (!city) {
+            city = await getCityFromAddress(partidaVal);
+        }
+
+        // Debugging/logging: show what we determined
+        console.log('[troop] partidaVal:', partidaVal);
+        try { console.log('[troop] autocomplete.getPlace():', autocomplete.getPlace && autocomplete.getPlace()); } catch(e) {}
+        console.log('[troop] determined city from components/geocode:', city);
+
+        // Quick fallback: if the address text contains 'pelotas', assume Pelotas
+        if (!city && partidaVal && partidaVal.toLowerCase().includes('pelotas')) {
+            city = 'Pelotas';
+            console.log('[troop] applied fallback city =>', city);
+        }
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        placeholder.hidden = true;
+        placeholder.textContent = 'Escolha a rota';
+        select.appendChild(placeholder);
+
+        if (!city) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.disabled = true;
+            opt.selected = true;
+            opt.textContent = 'Não foi possível identificar a cidade do endereço';
+            select.appendChild(opt);
+            return;
+        }
+
+        const routes = await fetchRoutesByCity(city);
+        console.log('[troop] routes fetched for select population:', routes && routes.length);
+        if (!routes || routes.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.disabled = true;
+            opt.selected = true;
+            opt.textContent = 'Nenhuma rota encontrada para essa cidade';
+            select.appendChild(opt);
+            return;
+        }
+
+        routes.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id || `${r.origin}|${r.destination}|${r.departureAt}`;
+            // store useful fields to show a summary when selected
+            opt.dataset.origin = r.origin || '';
+            opt.dataset.destination = r.destination || '';
+            opt.dataset.departure = r.departureAt || '';
+            const depart = r.departureAt ? ` - ${new Date(r.departureAt).toLocaleString()}` : '';
+            opt.textContent = `${r.origin} → ${r.destination}${depart}`;
+            select.appendChild(opt);
+        });
+        // restore previous selection when possible
+        if (prevValue) {
+            const match = Array.from(select.options).find(o => o.value === prevValue);
+            if (match) match.selected = true;
+        }
+        // trigger change to update selected summary if the select already has a value
+        try { destinoSelect.dispatchEvent(new Event('change')); } catch (e) {}
+    }
+
+    // Attach listeners: when focar/clicar em destino, atualiza opções
+    const destinoSelect = document.getElementById('destino');
+    destinoSelect.addEventListener('focus', updateDestinoOptions);
+    // When the user selects a route, show a clear summary under the select
+    destinoSelect.addEventListener('change', function () {
+        const sel = this.selectedOptions && this.selectedOptions[0];
+        if (!sel || !sel.value) return;
+
+        // Update the placeholder text to reflect the chosen route, but keep the option list intact
+        const placeholder = this.querySelector('option[hidden]');
+        if (placeholder) {
+            try { placeholder.hidden = true; placeholder.disabled = true; placeholder.selected = false; } catch (e) {}
+        }
+        // Force the select to display the chosen option: set selectedIndex to the option's index
+        try {
+            const opts = Array.from(this.options || []);
+            const idx = opts.indexOf(sel);
+            if (idx >= 0) {
+                this.selectedIndex = idx;
+            } else {
+                // fallback: set value
+                this.value = sel.value;
+            }
+        } catch (e) {
+            try { this.value = sel.value; } catch (err) {}
+        }
+        console.log('[troop] destino change - selected value:', this.value, 'selectedIndex:', this.selectedIndex);
+    });
+    // Quando o usuário altera texto da partida, restaurar placeholder no destino
+    partidaInput.addEventListener('input', function() {
+        const select = document.getElementById('destino');
+        select.innerHTML = '';
+        const ph = document.createElement('option'); ph.value=''; ph.disabled=true; ph.selected=true; ph.hidden=true; ph.textContent='Escolha a escola'; select.appendChild(ph);
+        partidaCoords = null; // reset coords until place selected or geocoded
+    });
+
+    // If user leaves the partida field (blur), try to update destinos (will geocode if needed)
+    partidaInput.addEventListener('blur', function() {
+        // slight delay to allow place_changed to run first if applicable
+        setTimeout(() => {
+            updateDestinoOptions().catch(() => {});
+        }, 150);
+    });
+
+    // Antes de renderMotoristas e inicializarMapaERotas, defina bairros fictícios:
+    const bairrosFicticios = [
+        { nome: "Centro", lat: -31.7654, lng: -52.3371 },
+        { nome: "Fragata", lat: -31.7700, lng: -52.3400 },
+        { nome: "Três Vendas", lat: -31.7500, lng: -52.3200 },
+        { nome: "Areal", lat: -31.7550, lng: -52.3500 }
+    ];
+
+    // Renderiza os cards de motoristas
+    function renderMotoristas() {
+        const cardsContainer = document.getElementById('motoristas-cards');
+        cardsContainer.innerHTML = "";
+
+        // Se não foi selecionado endereço de partida e escola, mostra todas as rotas saindo de bairros diferentes
+        let origemCustomizada = false;
+        if (!partidaCoords || !document.getElementById('destino').value) {
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                rotaObj.origem = {
+                    lat: bairrosFicticios[idx % bairrosFicticios.length].lat,
+                    lng: bairrosFicticios[idx % bairrosFicticios.length].lng
+                };
+            });
+            origemCustomizada = true;
+        } else {
+            // Distribui as vans em pontos distintos dentro do raio de 3km
+            const raioKm = 3;
+            const raioGraus = raioKm / 111; // Aproximadamente 1 grau = 111km
+            
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                // Calcula ângulos distintos para cada van (distribui uniformemente)
+                const angulo = (idx * (360 / motoristasPorRota.length)) * (Math.PI / 180);
+                // Varia a distância para criar mais diversidade
+                const distancia = raioGraus * (0.3 + (idx % 3) * 0.35); // Entre 30% e 95% do raio
+                
+                rotaObj.origem = {
+                    lat: partidaCoords.lat + Math.cos(angulo) * distancia,
+                    lng: partidaCoords.lng + Math.sin(angulo) * distancia
+                };
+            });
+            origemCustomizada = true;
+        }
+
+        motoristasPorRota.forEach((rotaObj, idx) => {
+            rotaObj.motoristas.forEach((motorista, mIdx) => {
+                // Horários diferentes: manhã, tarde, noite
+                const horariosPossiveis = ["07:00 (Manhã)", "14:00 (Tarde)", "19:00 (Noite)"];
+                const horario = horariosPossiveis[idx % horariosPossiveis.length];
+
+                // Pontos de parada reais (usados no mapa)
+                let paradas = [];
+                if (rotaObj.rota === "Escola de Inglês") {
+                    paradas.push({ nome: "Escola de Inglês", cor: rotaObj.cor });
+                    if (mIdx === 0) paradas.push({ nome: "Show (Evento)", cor: "#22c55e" });
+                }
+                if (rotaObj.rota === "Show (Evento)") paradas.push({ nome: "Show (Evento)", cor: rotaObj.cor });
+
+                // Detalhe do trajeto: mostra bolinhas coloridas dos pontos de parada
+                let trajeto = `Origem`;
+                if (paradas.length > 0) {
+                    trajeto += " ";
+                    trajeto += paradas.map(escola =>
+                        `<span class="inline-block align-middle mr-1">
+                            <span class="h-2 w-2 rounded-full inline-block mr-1" style="background:${escola.cor};border:1.5px solid #333"></span>
+                            <span>${escola.nome}</span>
+                        </span>`
+                    ).join(" ");
+                    trajeto += " - SENAC";
+                } else {
+                    trajeto += " - SENAC";
+                }
+
+                const card = document.createElement('div');
+                card.className = "bg-troop-white rounded-xl shadow-lg p-6 flex flex-col items-center";
+                card.innerHTML = `
+                    <div class="flex items-center mb-2">
+                        <span class="inline-block h-3 w-3 rounded-full mr-2" style="background:${rotaObj.cor}"></span>
+                        <span class="font-bold text-lg">${motorista.nome}</span>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        <img src="${motorista.foto}" alt="${motorista.nome}" class="h-12 w-12 rounded-full object-cover mr-4" style="border-color:${rotaObj.cor};border-width:2px;border-style:solid;">
+                        <div class="flex-1 text-left">
+                            <div class="font-semibold">${motorista.veiculo} • ${motorista.placa}</div>
+                            <div class="text-xs text-muted-foreground">${trajeto}</div>
+                            <div class="text-xs text-troop-purple font-bold mt-1">Horário: ${horario}</div>
+                        </div>
+                    </div>
+                    <button class="motorista-card w-full bg-troop-purple text-troop-white font-bold py-2 px-4 rounded-lg mt-2 hover:bg-troop-purple/90 transition-colors"
+                        data-rota="${rotaObj.rota}" data-idx="${idx}" data-motorista="${mIdx}">
+                        Selecionar
+                    </button>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        });
+    }
+
+    // Cada motorista tem sua rota traçada no mapa ao clicar
+    function inicializarMapaERotas() {
+        // Define o centro do mapa baseado no endereço de partida se disponível
+        const mapCenter = partidaCoords || { lat: -31.7654, lng: -52.3371 };
+        const mapZoom = partidaCoords ? 14 : 12; // Zoom ideal para ver círculo de 1km se há endereço selecionado
+        
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: mapCenter,
+            zoom: mapZoom,
+        });
+        directionsService = new google.maps.DirectionsService();
+
+        // Adiciona círculo de 1km de raio ao redor do endereço de partida
+        if (partidaCoords) {
+            const circle = new google.maps.Circle({
+                strokeColor: '#322275',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#322275',
+                fillOpacity: 0.1,
+                map: map,
+                center: partidaCoords,
+                radius: 1000 // 1km em metros
+            });
+            
+            // Ajusta o zoom e centro do mapa para mostrar perfeitamente o círculo de 1km
+            const bounds = circle.getBounds();
+            map.fitBounds(bounds);
+            
+            // Força um zoom específico que seja ideal para visualizar 1km de raio
+            setTimeout(() => {
+                map.setZoom(14);
+            }, 100);
+            
+            // Adiciona marcador no centro (endereço de partida)
+            new google.maps.Marker({
+                position: partidaCoords,
+                map: map,
+                title: "Seu endereço de partida",
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#322275',
+                    fillOpacity: 1,
+                    strokeColor: '#FFFFFF',
+                    strokeWeight: 3
+                }
+            });
+        }
+
+        let routeRenderers = [];
+        const enderecoSenac = "Rua Gonçalves Chaves, 604, Pelotas, RS";
+
+        // Coordenadas fictícias das escolas
+        const escolasCoords = {
+            "Escola de Inglês": { lat: -31.7800, lng: -52.3400 },
+            "Show (Evento)": { lat: -31.7500, lng: -52.3200 }
+        };
+
+        // Se não foi selecionado endereço de partida e escola, mostra todas as rotas saindo de bairros diferentes
+        if (!partidaCoords || !document.getElementById('destino').value) {
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                rotaObj.origem = {
+                    lat: bairrosFicticios[idx % bairrosFicticios.length].lat,
+                    lng: bairrosFicticios[idx % bairrosFicticios.length].lng
+                };
+            });
+        } else {
+            // Distribui as vans em pontos distintos dentro do raio de 1km
+            const raioKm = 1;
+            const raioGraus = raioKm / 111; // Aproximadamente 1 grau = 111km
+            
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                // Calcula ângulos distintos para cada van (distribui uniformemente)
+                const angulo = (idx * (360 / motoristasPorRota.length)) * (Math.PI / 180);
+                // Varia a distância para criar mais diversidade
+                const distancia = raioGraus * (0.3 + (idx % 3) * 0.35); // Entre 30% e 95% do raio
+                
+                rotaObj.origem = {
+                    lat: partidaCoords.lat + Math.cos(angulo) * distancia,
+                    lng: partidaCoords.lng + Math.sin(angulo) * distancia
+                };
+            });
+        }
+
+        motoristasPorRota.forEach((rotaObj, idx) => {
+            rotaObj.motoristas.forEach((motorista, mIdx) => {
+                let destinoFinal = enderecoSenac;
+                let waypoints = [];
+
+                // Motorista da Escola de Inglês faz Origem -> Escola de Inglês -> SENAC
+                if (rotaObj.rota === "Escola de Inglês") {
+                    waypoints.push({
+                        location: escolasCoords["Escola de Inglês"],
+                        stopover: true
+                    });
+                }
+                // Motorista do Show (Evento) faz Origem -> Show (Evento) -> SENAC
+                if (rotaObj.rota === "Show (Evento)") {
+                    waypoints.push({
+                        location: escolasCoords["Show (Evento)"],
+                        stopover: true
+                    });
+                }
+                // Exemplo extra: motorista da Escola A também passa pela Escola B antes do SENAC
+                if (rotaObj.rota === "Escola A" && mIdx === 0) {
+                    waypoints.push({
+                        location: escolasCoords["Escola B"],
+                        stopover: true
+                    });
+                }
+
+                const renderer = new google.maps.DirectionsRenderer({
+                    map: map,
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: rotaObj.cor,
+                        strokeOpacity: 0.9,
+                        strokeWeight: 6
+                    }
+                });
+                routeRenderers.push(renderer);
+
+                // Adiciona marcador na origem da van
+                new google.maps.Marker({
+                    position: rotaObj.origem,
+                    map: map,
+                    title: `Van de ${motorista.nome} - ${rotaObj.rota}`,
+                    icon: {
+                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                        scale: 6,
+                        fillColor: rotaObj.cor,
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2
+                    }
+                });
+
+                directionsService.route({
+                    origin: rotaObj.origem,
+                    destination: destinoFinal,
+                    waypoints: waypoints,
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, function(response, status) {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        renderer.setDirections(response);
+                        motorista.directions = response;
+                        motorista.renderer = renderer;
+
+                        // Adiciona marcadores para cada parada (waypoint)
+                        waypoints.forEach((wp, i) => {
+                            // Determina o nome da parada baseado nas coordenadas
+                            let nomeParada = 'Escola';
+                            for (const [nome, coords] of Object.entries(escolasCoords)) {
+                                if (Math.abs(coords.lat - wp.location.lat) < 0.001 && 
+                                    Math.abs(coords.lng - wp.location.lng) < 0.001) {
+                                    nomeParada = nome;
+                                    break;
+                                }
+                            }
+                            
+                            new google.maps.Marker({
+                                position: wp.location,
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: rotaObj.cor,
+                                    fillOpacity: 0.9,
+                                    strokeColor: "#FFFFFF",
+                                    strokeWeight: 3
+                                },
+                                title: `Parada: ${nomeParada}`,
+                                label: {
+                                    text: String(i + 1),
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold'
+                                }
+                            });
+                            
+                            // Adiciona InfoWindow com informações da parada
+                            const infoWindow = new google.maps.InfoWindow({
+                                content: `
+                                    <div style="padding: 8px;">
+                                        <h3 style="margin: 0; color: ${rotaObj.cor}; font-weight: bold;">${nomeParada}</h3>
+                                        <p style="margin: 4px 0; font-size: 12px;">Parada ${i + 1} da rota</p>
+                                        <p style="margin: 4px 0; font-size: 12px;">Motorista: ${motorista.nome}</p>
+                                        <p style="margin: 4px 0; font-size: 12px;">Veículo: ${motorista.veiculo}</p>
+                                    </div>
+                                `
+                            });
+                            
+                            // Cria o marcador da parada
+                            const paradaMarker = new google.maps.Marker({
+                                position: wp.location,
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: rotaObj.cor,
+                                    fillOpacity: 0.9,
+                                    strokeColor: "#FFFFFF",
+                                    strokeWeight: 3
+                                },
+                                title: `Parada: ${nomeParada}`,
+                                label: {
+                                    text: String(i + 1),
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold'
+                                }
+                            });
+                            
+                            // Adiciona evento de clique para mostrar InfoWindow
+                            paradaMarker.addListener('click', function() {
+                                infoWindow.open(map, paradaMarker);
+                            });
+                        });
+                    }
+                });
+
+                // Marcador de destino SENAC (apenas uma vez)
+                if (idx === 0 && mIdx === 0) {
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ address: enderecoSenac }, function(results, status) {
+                        if (status === "OK" && results[0]) {
+                            const senacMarker = new google.maps.Marker({
+                                position: results[0].geometry.location,
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 15,
+                                    fillColor: '#ff6b35',
+                                    fillOpacity: 1,
+                                    strokeColor: '#FFFFFF',
+                                    strokeWeight: 3
+                                },
+                                title: "Destino Final: SENAC",
+                                label: {
+                                    text: 'D',
+                                    color: '#FFFFFF',
+                                    fontSize: '14px',
+                                    fontWeight: 'bold'
+                                }
+                            });
+                            
+                            // InfoWindow para o destino SENAC
+                            const senacInfoWindow = new google.maps.InfoWindow({
+                                content: `
+                                    <div style="padding: 8px;">
+                                        <h3 style="margin: 0; color: #ff6b35; font-weight: bold;">SENAC</h3>
+                                        <p style="margin: 4px 0; font-size: 12px;">Destino Final</p>
+                                        <p style="margin: 4px 0; font-size: 12px;">Todas as rotas chegam aqui</p>
+                                        <p style="margin: 4px 0; font-size: 10px; color: #666;">${enderecoSenac}</p>
+                                    </div>
+                                `
+                            });
+                            
+                            // Evento de clique para mostrar InfoWindow do SENAC
+                            senacMarker.addListener('click', function() {
+                                senacInfoWindow.open(map, senacMarker);
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Legenda das vans
+        adicionarLegendaVans();
+
+        // Ao clicar no botão do motorista, mostra só a rota dele
+        document.querySelectorAll('.motorista-card').forEach((btn) => {
+            btn.addEventListener('click', function() {
+                routeRenderers.forEach(r => r.setMap(null));
+                const idx = parseInt(this.getAttribute('data-idx'));
+                const mIdx = parseInt(this.getAttribute('data-motorista'));
+                const motorista = motoristasPorRota[idx].motoristas[mIdx];
+                if (motorista.renderer) {
+                    motorista.renderer.setMap(map);
+                }
+                document.getElementById('etapa-2').classList.add('hidden');
+                document.getElementById('planos').classList.remove('hidden');
+                document.getElementById('planos').scrollIntoView({behavior: "smooth"});
+            });
+        });
+    }
+
+    // Adiciona legenda das vans no mapa
+    function adicionarLegendaVans() {
+        // Remove legenda anterior se existir
+        const oldLegend = document.getElementById('map-legend');
+        if (oldLegend) oldLegend.remove();
+
+        const legend = document.createElement('div');
+        legend.id = 'map-legend';
+        legend.className = 'absolute bottom-6 left-6 bg-white/90 rounded-xl shadow-lg p-4 text-left z-50';
+        legend.style.maxWidth = '320px';
+
+        legend.innerHTML = `
+            <div class="font-bold mb-2 text-troop-dark-gray">Legenda das Vans</div>
+            ${motoristasPorRota.map((rotaObj, idx) => `
+                <div class="flex items-center mb-1">
+                    <span class="inline-block h-4 w-4 rounded-full mr-2" style="background:${rotaObj.cor}"></span>
+                    <span class="font-semibold">${rotaObj.motoristas.map(m => m.nome).join(', ')}</span>
+                </div>
+            `).join('')}
+        `;
+        // Adiciona legenda dentro do container do mapa
+        document.querySelector('.relative.rounded-xl.overflow-hidden.shadow-lg.h-96').appendChild(legend);
+    }
+
+    // Botão de buscar rotas - agora consulta o backend via `troopApi.fetchRoutes`
+    document.getElementById('btn-etapa-1').onclick = async function(e) {
+        e.preventDefault();
+        const origin = document.getElementById('partida').value || '';
+        const destination = document.getElementById('destino').value || '';
+
+        try {
+            // fetchRoutes retorna objeto JSON (ex: { routes: [...] }) ou array
+            const resp = await (window.troopApi ? window.troopApi.fetchRoutes({ origin, destination }) : Promise.reject(new Error('API helper não carregado')));
+            let routesList = [];
+            if (Array.isArray(resp)) routesList = resp;
+            else if (resp.routes) routesList = resp.routes;
+
+            // Mapear rotas do backend para o formato esperado pelo frontend (motoristasPorRota)
+            // esqueleto: { rota, cor, origem: {lat,lng}, destino: {lat,lng}, motoristas: [{nome,foto,veiculo,placa}] }
+            const colors = ['#2563eb','#22c55e','#a21caf','#ff7f50','#f59e0b'];
+            // Limpa array existente e popula com novos itens
+            motoristasPorRota.length = 0;
+            routesList.forEach((r, i) => {
+                motoristasPorRota.push({
+                    rota: r.destination || r.destination,
+                    cor: colors[i % colors.length],
+                    origem: { lat: (r.originLat || r.origin?.lat) || -31.7654, lng: (r.originLng || r.origin?.lng) || -52.3371 },
+                    destino: { lat: (r.destinationLat || r.destination?.lat) || -31.7800, lng: (r.destinationLng || r.destination?.lng) || -52.3400 },
+                    motoristas: [ { nome: r.driver?.name || `Motorista ${i+1}`, foto: 'https://randomuser.me/api/portraits/lego/1.jpg', veiculo: r.vehicle || 'Van', placa: r.id ? `R${r.id}` : '---' } ]
+                });
+            });
+        } catch (err) {
+            console.error('Erro ao buscar rotas:', err);
+            // Mantém a UI funcional com dados fictícios, mas avisa o usuário
+            alert('Não foi possível buscar rotas do servidor. Mostrando resultados locais.');
+        }
+
+        document.getElementById('etapa-1').classList.add('hidden');
+        document.getElementById('etapa-2').classList.remove('hidden');
+        renderMotoristas();
+        inicializarMapaERotas();
+    };
+
+    // Destination select is updated by `updateDestinoOptions` when focused or clicked.
+
+    // Botão selecionar plano
+    document.querySelectorAll('.selecionar-plano').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = "login.html";
+        });
+    });
+});
+</script>
+    <!-- Troop frontend scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

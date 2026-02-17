@@ -19,9 +19,9 @@ Nesta etapa, preparamos o terreno do backend:
 
 ### Modelagem com Prisma
 Arquivo: [backend/prisma/schema.prisma](backend/prisma/schema.prisma)
-- `enum UserRole { PASSENGER, DRIVER }`
+- `enum UserRole { PASSENGER, DRIVER, ADMIN }`
 - `User`: `email` único, `passwordHash`, `role` (default PASSENGER), `createdAt`.
-- `VanRoute`: `origin`, `destination`, `departureAt`, `seatCapacity`, `published` (bool), `driverId` relação com `User` (quem é o motorista), índices para busca.
+- `Route`: `origin`, `destination`, `departureAt`, `seatCapacity`, `published` (bool), `driverId` relação com `User` (quem é o motorista), índices para busca. Rotas são gerenciadas por administradores (ADMIN).
 - `Booking`: ligação `userId` ↔ `routeId`, `@@unique([userId, routeId])` impede o mesmo usuário de reservar a mesma rota duas vezes.
 
 ### Conexão Inicial (Migration)
@@ -63,16 +63,17 @@ npx prisma studio
 ```
 
 ## Regras de Negócio Críticas
-- Capacidade: antes de confirmar um `Booking`, contar reservas da `VanRoute` e comparar com `seatCapacity`.
+- Capacidade: antes de confirmar um `Booking`, contar reservas da `Route` e comparar com `seatCapacity`.
 - Duplicidade: bloquear que o mesmo usuário (`userId`) reserve a mesma `routeId` duas vezes (já garantido por `@@unique`).
 - Perfis de usuário:
   - Passageiro (`PASSENGER`): login, busca de rotas e contratação.
-  - Motorista (`DRIVER`): criar e publicar rotas.
+  - Motorista (`DRIVER`): motorista — pode ser vinculado a rotas, mas não cria rotas diretamente.
+  - Administrador (`ADMIN`): gerencia criação, edição e publicação de rotas.
   - Observação: a validação de perfil será aplicada na camada de serviço/rotas HTTP.
 
 ## Próximos Passos
 - Autenticação JWT: endpoints de cadastro e login.
-- Rotas de Van: CRUD limitado a `DRIVER` e listagem pública (apenas `published`).
+- Rotas: CRUD gerenciado por `ADMIN`; listagem pública (apenas `published`).
 - Agendamentos: endpoint para criar `Booking` com validações de capacidade e duplicidade.
 - Middleware de auth para proteger rotas sensíveis.
 

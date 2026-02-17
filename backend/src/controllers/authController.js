@@ -25,7 +25,7 @@ export async function register(req, res) {
     }
 
     // Validar role se fornecida
-    const validRoles = ['PASSENGER', 'DRIVER'];
+    const validRoles = ['PASSENGER', 'DRIVER', 'ADMIN'];
     const userRole = role && validRoles.includes(role) ? role : 'PASSENGER';
 
     // Verificar se o email já existe

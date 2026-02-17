@@ -11,6 +11,7 @@ generator client {
 enum UserRole {
   PASSENGER
   DRIVER
+  ADMIN
 }
 
 model User {
@@ -21,19 +22,28 @@ model User {
   createdAt    DateTime  @default(now())
   role         UserRole  @default(PASSENGER)
   bookings     Booking[]
-  routes       VanRoute[] @relation("DriverRoutes")
+  routes       Route[] @relation("DriverRoutes")
 }
 
-model VanRoute {
+model Route {
   id           Int       @id @default(autoincrement())
   origin       String
+  originPlaceId String?
+  originLat    Float?
+  originLng    Float?
   destination  String
+  destinationPlaceId String?
+  destinationLat    Float?
+  destinationLng    Float?
+  // Optional ordered stops / waypoints between origin and destination.
+  // Stored as related `Stop` records (one-to-many).
+  stops        Stop[]
   departureAt  DateTime
   seatCapacity Int
   createdAt    DateTime  @default(now())
   published    Boolean   @default(false)
-  driverId     Int
-  driver       User      @relation("DriverRoutes", fields: [driverId], references: [id], onDelete: Cascade)
+  driverId     Int?
+  driver       User?     @relation("DriverRoutes", fields: [driverId], references: [id], onDelete: Cascade)
   bookings     Booking[]
 
   @@index([departureAt])
@@ -49,8 +59,25 @@ model Booking {
   createdAt DateTime  @default(now())
 
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  route  VanRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  route  Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, routeId], name: "unique_user_route_booking")
   @@index([routeId])
+}
+
+// Stops / waypoints for Route
+model Stop {
+  id       Int      @id @default(autoincrement())
+  routeId  Int
+  address  String
+  placeId  String?
+  lat      Float?
+  lng      Float?
+  order    Int      @default(1)
+  createdAt DateTime @default(now())
+
+  route Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@index([routeId])
+  @@index([routeId, order])
 }

@@ -201,7 +201,7 @@ curl -X GET http://localhost:3000/auth/me \
 - ✅ Senha mínima de 6 caracteres
 - ✅ Email único (não permite duplicatas)
 - ✅ Senha criptografada com bcrypt (10 rounds)
-- ✅ Role validado (apenas PASSENGER ou DRIVER)
+- ✅ Role validado (PASSENGER, DRIVER, ADMIN)
 - ✅ Token JWT gerado automaticamente
 
 ### Login:
@@ -225,7 +225,8 @@ curl -X GET http://localhost:3000/auth/me \
 
 ### 2. Perfis de Usuário
 - **PASSENGER** (padrão): busca rotas e faz agendamentos
-- **DRIVER**: cria e publica rotas de van
+- **DRIVER**: motorista — pode ser vinculado a rotas como responsável, mas não cria rotas diretamente
+- **ADMIN**: administrador do sistema — pode criar, editar e publicar rotas (manual ou automático)
 
 ### 3. Segurança
 - Senhas **nunca** são retornadas em respostas da API
@@ -237,11 +238,11 @@ curl -X GET http://localhost:3000/auth/me \
 
 Agora que o sistema de autenticação está pronto, você pode implementar:
 
-1. **Gestão de Rotas** (VanRoute):
-   - POST `/routes` - Criar rota (somente DRIVER)
-   - GET `/routes` - Listar rotas publicadas
-   - PUT `/routes/:id` - Atualizar rota (somente dono)
-   - DELETE `/routes/:id` - Deletar rota (somente dono)
+1. **Gestão de Rotas** (Route):
+  - POST `/routes` - Criar rota (somente ADMIN)
+  - GET `/routes` - Listar rotas publicadas
+  - PUT `/routes/:id` - Atualizar rota (somente ADMIN ou dono, conforme política)
+  - DELETE `/routes/:id` - Deletar rota (somente ADMIN ou dono)
 
 2. **Sistema de Agendamento** (Booking):
    - POST `/bookings` - Criar agendamento (somente PASSENGER)
@@ -254,15 +255,15 @@ Agora que o sistema de autenticação está pronto, você pode implementar:
 ## Exemplo de Fluxo Completo
 
 ```bash
-# 1. Registrar motorista
-DRIVER_TOKEN=$(curl -s -X POST http://localhost:3000/auth/register \
+# 1. Registrar administrador
+ADMIN_TOKEN=$(curl -s -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"João","email":"joao@troop.com","password":"senha123","role":"DRIVER"}' \
+  -d '{"name":"Admin","email":"admin@troop.com","password":"senha123","role":"ADMIN"}' \
   | jq -r '.token')
 
-# 2. Criar rota de van (próximo passo a implementar)
+# 2. Criar rota (somente ADMIN)
 curl -X POST http://localhost:3000/routes \
-  -H "Authorization: Bearer $DRIVER_TOKEN" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "origin": "São Paulo",

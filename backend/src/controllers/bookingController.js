@@ -21,7 +21,7 @@ export async function createBooking(req, res, next) {
     }
 
     // Buscar rota incluindo contagem de bookings
-    const route = await prisma.vanRoute.findUnique({
+    const route = await prisma.route.findUnique({
       where: { id: Number(routeId) },
       include: { _count: { select: { bookings: true } } }
     });
@@ -32,11 +32,11 @@ export async function createBooking(req, res, next) {
 
     // Determinar capacidade máxima por veículo
     const seatCapacity = Number(route.seatCapacity || 0);
-    const maxAllowed = 16; // default for vans
+    const maxAllowed = 16; // default maximum
     const effectiveCapacity = Math.min(seatCapacity > 0 ? seatCapacity : maxAllowed, maxAllowed);
 
     if (route._count && route._count.bookings >= effectiveCapacity) {
-      return res.status(400).json({ error: 'Van lotada' });
+      return res.status(400).json({ error: 'Rota lotada' });
     }
 
     // Evitar duplicidade (checar se já existe reserva do mesmo usuário para a rota)
