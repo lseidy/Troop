@@ -89,7 +89,7 @@
     <script>
 document.addEventListener("DOMContentLoaded", function () {
     // Dados dos motoristas por rota (removido um motorista e adicionados lugares fictícios das escolas)
-    const motoristasPorRota = [
+    const motoristasPorRota = window.motoristasPorRota = [
         {
             rota: "Escola de Inglês",
             cor: "#2563eb",
@@ -568,57 +568,14 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector('.relative.rounded-xl.overflow-hidden.shadow-lg.h-96').appendChild(legend);
     }
 
-    // Botão de buscar rotas - agora consulta o backend via `troopApi.fetchRoutes`
-    document.getElementById('btn-etapa-1').onclick = async function(e) {
-        e.preventDefault();
-        const origin = document.getElementById('partida').value || '';
-        const destination = document.getElementById('destino').value || '';
-        const date = document.getElementById('data').value || '';
-
-        try {
-            // fetchRoutes retorna objeto JSON (ex: { routes: [...] }) ou array
-            const resp = await (window.troopApi ? window.troopApi.fetchRoutes({ origin, destination, date }) : Promise.reject(new Error('API helper não carregado')));
-            let routesList = [];
-            if (Array.isArray(resp)) routesList = resp;
-            else if (resp.routes) routesList = resp.routes;
-
-            // Mapear rotas do backend para o formato esperado pelo frontend (motoristasPorRota)
-            // esqueleto: { rota, cor, origem: {lat,lng}, destino: {lat,lng}, motoristas: [{nome,foto,veiculo,placa}] }
-            const colors = ['#2563eb','#22c55e','#a21caf','#ff7f50','#f59e0b'];
-            // Limpa array existente e popula com novos itens
-            motoristasPorRota.length = 0;
-            routesList.forEach((r, i) => {
-                motoristasPorRota.push({
-                    rota: r.destination || r.destination,
-                    cor: colors[i % colors.length],
-                    origem: { lat: (r.originLat || r.origin?.lat) || -31.7654, lng: (r.originLng || r.origin?.lng) || -52.3371 },
-                    destino: { lat: (r.destinationLat || r.destination?.lat) || -31.7800, lng: (r.destinationLng || r.destination?.lng) || -52.3400 },
-                    motoristas: [ { nome: r.driver?.name || `Motorista ${i+1}`, foto: 'https://randomuser.me/api/portraits/lego/1.jpg', veiculo: r.vehicle || 'Van', placa: r.id ? `R${r.id}` : '---' } ]
-                });
-            });
-        } catch (err) {
-            console.error('Erro ao buscar rotas:', err);
-            // Mantém a UI funcional com dados fictícios, mas avisa o usuário
-            alert('Não foi possível buscar rotas do servidor. Mostrando resultados locais.');
-        }
-
-        document.getElementById('etapa-1').classList.add('hidden');
-        document.getElementById('etapa-2').classList.remove('hidden');
-        renderMotoristas();
-        inicializarMapaERotas();
-    };
-
-    // Botão selecionar plano
-    document.querySelectorAll('.selecionar-plano').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = "login.html";
-        });
-    });
+    // Expõe funções principais no escopo global para que outros scripts (ex: js/troop.js) possam reutilizar
+    window.renderMotoristas = renderMotoristas;
+    window.inicializarMapaERotas = inicializarMapaERotas;
 });
 </script>
     <!-- Troop frontend scripts -->
-    <script src="js/api.js"></script>
+    <script type="module" src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script type="module" src="js/troop.js"></script>
 </body>
 </html>

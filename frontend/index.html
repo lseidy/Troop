@@ -60,7 +60,7 @@
     <header class="absolute top-0 left-0 right-0 z-50 bg-transparent">
         <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
             <!-- Logo -->
-            <div class="flex items-center space-x-4">
+            <div id="header-logo" class="flex items-center space-x-4">
                 <div class="relative flex items-center justify-center h-14 w-14 md:h-16 md:w-16 bg-troop-white/90 rounded-2xl shadow-2xl">
                     <img src="https://img.icons8.com/?size=100&id=QTQ1x0Wu6rnn&format=png&color=000000" alt="Van Escolar" class="h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow-xl" />
                 </div>
@@ -68,7 +68,7 @@
             </div>
             <!-- Navigation -->
             <div class="hidden md:flex items-center">
-                <a href="#" class="ml-2 bg-gradient-to-r from-troop-white/80 to-troop-purple/30 border border-troop-white/40 text-troop-purple hover:bg-troop-white hover:text-troop-purple font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 text-base scale-105">Login</a>
+                <a id="header-login" href="#" class="ml-2 bg-gradient-to-r from-troop-white/80 to-troop-purple/30 border border-troop-white/40 text-troop-purple hover:bg-troop-white hover:text-troop-purple font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 text-base scale-105">Login</a>
             </div>
             <!-- Mobile menu button -->
             <div class="md:hidden flex items-center">
@@ -93,6 +93,7 @@
                 <!-- Card com campos (lado esquerdo) -->
                 <div class="bg-troop-white/95 backdrop-blur-sm shadow-strong border-0 p-10 md:p-16 rounded-3xl">
                     <div class="space-y-6 mb-10">
+                        <p class="text-sm md:text-base font-semibold text-troop-dark-gray mb-2">Descubra rotas seguras para o seu destino agora</p>
                         <div class="grid md:grid-cols-1 gap-6">
                             <div class="relative">
                                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -112,7 +113,7 @@
                         </div>
                         <button id="btn-etapa-1" class="w-full bg-troop-purple text-troop-white font-bold py-2 px-4 rounded-lg shadow-lg transform hover:scale-105 flex items-center justify-center text-base transition-all duration-300 hover:shadow-xl">
                             <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                            BUSCAR ROTAS DISPONÍVEIS
+                            BUSCAR ROTAS
                         </button>
                     </div>
                     <!-- Título (lado direito) -->
@@ -127,16 +128,79 @@
                     </div>
                 </div>
             </div>
-            <div id="etapa-2" class="hidden">
-                <!-- Section do mapa + cards de motoristas -->
-                <section class="py-10 bg-troop-white">
-                    <div class="container mx-auto px-6 text-center">
-                        <h2 class="font-horizon text-3xl md:text-4xl text-troop-dark-gray mb-4">Escolha sua rota e motorista</h2>
-                        <div class="relative rounded-xl overflow-hidden shadow-lg h-96 lg:h-128 mb-8">
-                            <div id="map" class="w-full h-full"></div>
-                            <div class="absolute inset-0 pointer-events-none"></div>
+            <div id="etapa-2" class="hidden bg-troop-light-gray">
+                <!-- Dashboard de comparação: barra de busca + mapa + lista -->
+                <section class="h-screen flex flex-col">
+                    <!-- Barra de busca compacta (top bar) -->
+                    <div class="shrink-0 border-b border-gray-200 bg-troop-white/90 backdrop-blur-md">
+                        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div class="flex flex-col md:flex-row md:items-baseline gap-1">
+                                <span class="font-horizon text-lg text-troop-purple tracking-wide">Comparar rotas</span>
+                                <span class="text-xs text-muted-foreground md:ml-2">Ajuste sua busca sem sair da tela.</span>
+                            </div>
+                            <form id="results-search-form" class="grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_auto] gap-2 w-full md:max-w-3xl">
+                                <div class="relative">
+                                    <label for="results-origin" class="sr-only">Origem</label>
+                                    <input id="results-origin" type="text" placeholder="Origem" class="w-full h-10 rounded-lg border border-muted px-3 pl-9 text-xs md:text-sm text-troop-dark-gray focus:outline-none focus:ring-2 focus:ring-troop-purple/50 focus:border-troop-purple bg-white/90" />
+                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                </div>
+                                <div class="relative">
+                                    <label for="results-destino" class="sr-only">Destino</label>
+                                    <select id="results-destino" class="w-full h-10 rounded-lg border border-muted px-3 pl-9 text-xs md:text-sm text-troop-dark-gray focus:outline-none focus:ring-2 focus:ring-troop-purple/50 focus:border-troop-purple bg-white/90 appearance-none">
+                                        <option value="" disabled selected hidden>Destino</option>
+                                    </select>
+                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                </div>
+                                <div class="flex items-stretch gap-2">
+                                    <div class="relative flex-1">
+                                        <label for="results-date" class="sr-only">Data</label>
+                                        <input id="results-date" type="date" class="w-full h-10 rounded-lg border border-muted px-3 text-xs md:text-sm text-troop-dark-gray focus:outline-none focus:ring-2 focus:ring-troop-purple/50 focus:border-troop-purple bg-white/90" />
+                                    </div>
+                                    <button type="submit" class="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-troop-purple text-troop-white text-xs md:text-sm font-semibold shadow-md hover:bg-troop-purple/90 transition-colors whitespace-nowrap">
+                                        <svg class="h-4 w-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                        Atualizar busca
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div id="motoristas-cards" class="grid md:grid-cols-3 gap-6 mt-8"></div>
+                    </div>
+
+                    <!-- Área principal: mapa + barra lateral -->
+                    <div class="flex-1 flex flex-col md:flex-row">
+                        <!-- Mapa (esquerda no desktop) -->
+                        <div id="results-map-shell" class="relative md:w-7/12 lg:w-2/3 h-[40vh] md:h-full bg-gray-100">
+                            <div id="map" class="absolute inset-0"></div>
+                            <!-- Botão flutuante de recentralizar -->
+                            <button id="btn-recentralizar" class="absolute bottom-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-troop-white/95 text-troop-dark-gray text-xs font-semibold shadow-lg px-3 py-1.5 border border-gray-200 hover:bg-troop-white">
+                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h.01"/><path d="M7 3h5"/><path d="M3 7v5"/><path d="M21 3v5h-.01"/><path d="M17 3h-5"/><path d="M21 7v5"/><path d="M3 21v-5h.01"/><path d="M7 21h5"/><path d="M3 17v-5"/><path d="M21 21v-5h-.01"/><path d="M17 21h-5"/><path d="M21 17v-5"/><circle cx="12" cy="12" r="3"/></svg>
+                                Recentralizar
+                            </button>
+                            <!-- A legenda das vans será injetada aqui via JS -->
+                        </div>
+
+                        <!-- Barra lateral de motoristas (direita no desktop) -->
+                        <aside class="md:w-5/12 lg:w-1/3 h-[60vh] md:h-full bg-troop-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
+                            <!-- Cabeçalho + filtros rápidos -->
+                            <div class="px-4 pt-4 pb-3 border-b border-gray-200">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div>
+                                        <h2 class="font-semibold text-sm text-troop-dark-gray">Comparar motoristas</h2>
+                                        <p class="text-xs text-muted-foreground">Filtre por preço, avaliação e vagas.</p>
+                                    </div>
+                                    <span id="drivers-count" class="text-[11px] px-2 py-0.5 rounded-full bg-troop-light-gray text-muted-foreground"></span>
+                                </div>
+                                <div id="driver-filters" class="flex flex-wrap gap-2">
+                                    <button type="button" data-filter="" class="filter-pill inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-troop-purple text-troop-white shadow-sm">Todos</button>
+                                    <button type="button" data-filter="cheapest" class="filter-pill inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-troop-light-gray text-troop-dark-gray hover:bg-muted">Mais barata</button>
+                                    <button type="button" data-filter="rating" class="filter-pill inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-troop-light-gray text-troop-dark-gray hover:bg-muted">Melhor avaliada</button>
+                                    <button type="button" data-filter="seats" class="filter-pill inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-troop-light-gray text-troop-dark-gray hover:bg-muted">Vagas disponíveis</button>
+                                </div>
+                            </div>
+
+                            <!-- Lista de motoristas / estado vazio -->
+                            <div id="drivers-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+                        </aside>
                     </div>
                 </section>
             </div>
@@ -280,47 +344,95 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let partidaCoords = null;
     let map, marker, directionsService, directionsRenderer, polylines = [];
+    // Contexto de onde o login foi aberto ("header" ou "buscar")
+    let loginFlowContext = null;
 
     // CEP detection removed; destination options are populated based on the `partida` field.
 
-    // Google Places Autocomplete para o campo de partida
+    // Google Places Autocomplete para os campos de partida (etapa 1 e etapa 2)
     const partidaInput = document.getElementById('partida');
-    let autocomplete = new google.maps.places.Autocomplete(partidaInput, {
-        types: ['address'], // Permite endereços completos incluindo nomes de ruas
-        componentRestrictions: { country: 'br' }
-    });
-    autocomplete.addListener('place_changed', function () {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) return;
-        partidaCoords = {
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng()
-        };
+    const resultsOriginInput = document.getElementById('results-origin');
 
-        // Mostra o endereço completo selecionado no campo de partida
-        partidaInput.value = place.formatted_address;
+    let autocomplete = null;
+    let autocompleteResults = null;
 
-        // Remove qualquer extração manual do bairro!
-        let bairroDiv = document.getElementById('bairro-partida');
-        if (bairroDiv) bairroDiv.remove();
-
-        // Atualiza as origens das vans para ficarem próximas ao endereço de partida
-        motoristasPorRota.forEach((rotaObj, idx) => {
-            const offset = 0.003 + idx * 0.0015;
-            rotaObj.origem = {
-                lat: partidaCoords.lat + (Math.random() - 0.5) * offset,
-                lng: partidaCoords.lng + (Math.random() - 0.5) * offset
-            };
+    if (partidaInput) {
+        autocomplete = new google.maps.places.Autocomplete(partidaInput, {
+            types: ['address'], // Permite endereços completos incluindo nomes de ruas
+            componentRestrictions: { country: 'br' }
         });
+        autocomplete.addListener('place_changed', function () {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) return;
+            partidaCoords = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
 
-        // Se o mapa já foi inicializado, recentra no novo endereço com zoom ideal para o círculo de 1km
-        if (map) {
-            map.setCenter(partidaCoords);
-            map.setZoom(14); // Zoom ideal para visualizar círculo de 1km
-        }
-        // After selecting a place, update destination options from backend by city
-        updateDestinoOptions().catch(err => console.error('Erro atualizando destinos:', err));
-    });
+            // Mostra o endereço completo selecionado no campo de partida
+            partidaInput.value = place.formatted_address;
+            if (resultsOriginInput) resultsOriginInput.value = place.formatted_address;
+
+            // Remove qualquer extração manual do bairro!
+            let bairroDiv = document.getElementById('bairro-partida');
+            if (bairroDiv) bairroDiv.remove();
+
+            // Atualiza as origens das vans para ficarem próximas ao endereço de partida
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                const offset = 0.003 + idx * 0.0015;
+                rotaObj.origem = {
+                    lat: partidaCoords.lat + (Math.random() - 0.5) * offset,
+                    lng: partidaCoords.lng + (Math.random() - 0.5) * offset
+                };
+            });
+
+            // Se o mapa já foi inicializado, recentra no novo endereço com zoom ideal para o círculo de 1km
+            if (map) {
+                map.setCenter(partidaCoords);
+                map.setZoom(14); // Zoom ideal para visualizar círculo de 1km
+            }
+            // After selecting a place, update destination options from backend by city
+            updateDestinoOptions().catch(err => console.error('Erro atualizando destinos:', err));
+        });
+    }
+
+    if (resultsOriginInput) {
+        autocompleteResults = new google.maps.places.Autocomplete(resultsOriginInput, {
+            types: ['address'],
+            componentRestrictions: { country: 'br' }
+        });
+        autocompleteResults.addListener('place_changed', function () {
+            const place = autocompleteResults.getPlace();
+            if (!place.geometry) return;
+            partidaCoords = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
+
+            resultsOriginInput.value = place.formatted_address;
+            if (partidaInput) partidaInput.value = place.formatted_address;
+
+            motoristasPorRota.forEach((rotaObj, idx) => {
+                const offset = 0.003 + idx * 0.0015;
+                rotaObj.origem = {
+                    lat: partidaCoords.lat + (Math.random() - 0.5) * offset,
+                    lng: partidaCoords.lng + (Math.random() - 0.5) * offset
+                };
+            });
+
+            if (map) {
+                map.setCenter(partidaCoords);
+                map.setZoom(14);
+            }
+
+            // Atualiza a lista de destinos da etapa-2 usando a mesma lógica da etapa-1
+            const destinoSelect = document.getElementById('results-destino');
+            if (destinoSelect) {
+                updateDestinoOptionsFor(resultsOriginInput, destinoSelect, autocompleteResults)
+                    .catch(err => console.error('Erro atualizando destinos (etapa 2):', err));
+            }
+        });
+    }
 
     // Utility: calcula distância (km) entre dois pontos
     function haversineKm(a, b) {
@@ -372,6 +484,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Short label helper: take the first segment before a comma
+    function shortLabel(full) {
+        if (!full || typeof full !== 'string') return full || '';
+        return full.split(',')[0].trim();
+    }
+
     // Fetch routes from backend where origin or destination contains the city.
     async function fetchRoutesByCity(city) {
         console.log('[troop] fetchRoutesByCity called with city:', city);
@@ -413,13 +531,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Atualiza opções do select `destino` usando rotas vindas do backend
-    async function updateDestinoOptions() {
-        const select = document.getElementById('destino');
-        const partidaVal = partidaInput.value && partidaInput.value.trim();
-        // preserve current selection so we can restore it after repopulating
-        const prevValue = select.value || null;
-        select.innerHTML = '';
+    // Atualiza opções do select `destino` usando rotas vindas do backend (função genérica)
+    async function updateDestinoOptionsFor(originInputEl, destinoSelectEl, autocompleteInstance) {
+        if (!destinoSelectEl || !originInputEl) return;
+
+        const partidaVal = originInputEl.value && originInputEl.value.trim();
+        const prevValue = destinoSelectEl.value || null;
+        destinoSelectEl.innerHTML = '';
 
         if (!partidaVal) {
             const opt = document.createElement('option');
@@ -427,15 +545,14 @@ document.addEventListener("DOMContentLoaded", function () {
             opt.disabled = true;
             opt.selected = true;
             opt.textContent = 'Insira um endereço no campo anterior';
-            select.appendChild(opt);
+            destinoSelectEl.appendChild(opt);
             return;
         }
 
         // determine city from the selected place (if available) or geocode the address
         let city = null;
         try {
-            // If autocomplete produced a Place, attempt to extract city from its components
-            const place = autocomplete.getPlace && autocomplete.getPlace();
+            const place = autocompleteInstance && autocompleteInstance.getPlace && autocompleteInstance.getPlace();
             if (place && place.address_components) {
                 for (const comp of place.address_components) {
                     if (comp.types.includes('locality') || comp.types.includes('administrative_area_level_2')) {
@@ -451,7 +568,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Debugging/logging: show what we determined
         console.log('[troop] partidaVal:', partidaVal);
-        try { console.log('[troop] autocomplete.getPlace():', autocomplete.getPlace && autocomplete.getPlace()); } catch(e) {}
+        try { console.log('[troop] autocompleteInstance.getPlace():', autocompleteInstance && autocompleteInstance.getPlace && autocompleteInstance.getPlace()); } catch(e) {}
         console.log('[troop] determined city from components/geocode:', city);
 
         // Quick fallback: if the address text contains 'pelotas', assume Pelotas
@@ -466,7 +583,7 @@ document.addEventListener("DOMContentLoaded", function () {
         placeholder.selected = true;
         placeholder.hidden = true;
         placeholder.textContent = 'Escolha a rota';
-        select.appendChild(placeholder);
+        destinoSelectEl.appendChild(placeholder);
 
         if (!city) {
             const opt = document.createElement('option');
@@ -474,7 +591,7 @@ document.addEventListener("DOMContentLoaded", function () {
             opt.disabled = true;
             opt.selected = true;
             opt.textContent = 'Não foi possível identificar a cidade do endereço';
-            select.appendChild(opt);
+            destinoSelectEl.appendChild(opt);
             return;
         }
 
@@ -486,31 +603,90 @@ document.addEventListener("DOMContentLoaded", function () {
             opt.disabled = true;
             opt.selected = true;
             opt.textContent = 'Nenhuma rota encontrada para essa cidade';
-            select.appendChild(opt);
+            destinoSelectEl.appendChild(opt);
             return;
         }
+        // Build a list of display entries: include routes that have full origin+destination coords
+        // and also include each stop as a separate entry (origin -> stop) when the stop has coords.
+        const entries = [];
+        for (const r of routes) {
+            const originLat = r.originLat ?? (r.origin && r.origin.lat) ?? null;
+            const originLng = r.originLng ?? (r.origin && r.origin.lng) ?? null;
+            const destLat = r.destinationLat ?? (r.destination && r.destination.lat) ?? null;
+            const destLng = r.destinationLng ?? (r.destination && r.destination.lng) ?? null;
 
-        routes.forEach(r => {
+            const hasOriginCoords = originLat !== null && originLng !== null && isFinite(Number(originLat)) && isFinite(Number(originLng));
+            const hasDestCoords = destLat !== null && destLng !== null && isFinite(Number(destLat)) && isFinite(Number(destLng));
+
+            // Only include the full route if both origin and destination have coordinates
+            if (hasOriginCoords && hasDestCoords) {
+                entries.push({
+                    key: r.id ? String(r.id) : `${r.origin}|${r.destination}|${r.departureAt}`,
+                    origin: r.origin || '',
+                    destination: r.destination || '',
+                    departureAt: r.departureAt || '',
+                    originLat: Number(originLat),
+                    originLng: Number(originLng),
+                    destinationLat: Number(destLat),
+                    destinationLng: Number(destLng),
+                    sourceRouteId: r.id || null
+                });
+            }
+
+            // If route has stops, include each stop as a separate selectable "route" (origin -> stop)
+            if (Array.isArray(r.stops) && r.stops.length) {
+                for (const s of r.stops) {
+                    const sLat = s.lat ?? null;
+                    const sLng = s.lng ?? null;
+                    if (sLat !== null && sLng !== null && isFinite(Number(sLat)) && isFinite(Number(sLng)) && hasOriginCoords) {
+                        entries.push({
+                            key: r.id ? `${r.id}-stop-${s.id}` : `${r.origin}|${s.address}|${r.order}`,
+                            origin: r.origin || '',
+                            destination: s.address || s.name || '',
+                            departureAt: r.departureAt || '',
+                            originLat: Number(originLat),
+                            originLng: Number(originLng),
+                            destinationLat: Number(sLat),
+                            destinationLng: Number(sLng),
+                            sourceRouteId: r.id || null,
+                            stopId: s.id || null
+                        });
+                    }
+                }
+            }
+        }
+
+        // Deduplicate entries by key and then append to select
+        const seen = new Set();
+        for (const e of entries) {
+            if (!e || !e.key) continue;
+            if (seen.has(e.key)) continue;
+            seen.add(e.key);
             const opt = document.createElement('option');
-            opt.value = r.id || `${r.origin}|${r.destination}|${r.departureAt}`;
-            // store useful fields to show a summary when selected
-            opt.dataset.origin = r.origin || '';
-            opt.dataset.destination = r.destination || '';
-            opt.dataset.departure = r.departureAt || '';
-            const depart = r.departureAt ? ` - ${new Date(r.departureAt).toLocaleString()}` : '';
-            opt.textContent = `${r.origin} → ${r.destination}${depart}`;
-            select.appendChild(opt);
-        });
+            opt.value = e.key;
+            opt.dataset.origin = e.origin || '';
+            opt.dataset.destination = e.destination || '';
+            opt.dataset.departure = e.departureAt || '';
+            // Only show origin and destination in the option label (no dates or extra metadata)
+            opt.textContent = `${shortLabel(e.origin)} → ${shortLabel(e.destination)}`;
+            destinoSelectEl.appendChild(opt);
+        }
         // restore previous selection when possible
         if (prevValue) {
-            const match = Array.from(select.options).find(o => o.value === prevValue);
+            const match = Array.from(destinoSelectEl.options).find(o => o.value === prevValue);
             if (match) match.selected = true;
         }
         // trigger change to update selected summary if the select already has a value
-        try { destinoSelect.dispatchEvent(new Event('change')); } catch (e) {}
+        try { destinoSelectEl.dispatchEvent(new Event('change')); } catch (e) {}
     }
 
-    // Attach listeners: when focar/clicar em destino, atualiza opções
+    // Versão específica da etapa-1, para manter compatibilidade
+    async function updateDestinoOptions() {
+        const select = document.getElementById('destino');
+        return updateDestinoOptionsFor(partidaInput, select, autocomplete);
+    }
+
+    // Attach listeners: when focar/clicar em destino (etapa 1), atualiza opções
     const destinoSelect = document.getElementById('destino');
     destinoSelect.addEventListener('focus', updateDestinoOptions);
     // When the user selects a route, show a clear summary under the select
@@ -538,21 +714,63 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         console.log('[troop] destino change - selected value:', this.value, 'selectedIndex:', this.selectedIndex);
     });
-    // Quando o usuário altera texto da partida, restaurar placeholder no destino
-    partidaInput.addEventListener('input', function() {
-        const select = document.getElementById('destino');
-        select.innerHTML = '';
-        const ph = document.createElement('option'); ph.value=''; ph.disabled=true; ph.selected=true; ph.hidden=true; ph.textContent='Escolha a escola'; select.appendChild(ph);
-        partidaCoords = null; // reset coords until place selected or geocoded
-    });
+    // Quando o usuário altera texto da partida, restaurar placeholder no destino (etapa 1)
+    if (partidaInput) {
+        partidaInput.addEventListener('input', function() {
+            const select = document.getElementById('destino');
+            if (!select) return;
+            select.innerHTML = '';
+            const ph = document.createElement('option'); ph.value=''; ph.disabled=true; ph.selected=true; ph.hidden=true; ph.textContent='Escolha a escola'; select.appendChild(ph);
+            partidaCoords = null; // reset coords until place selected or geocoded
+        });
 
-    // If user leaves the partida field (blur), try to update destinos (will geocode if needed)
-    partidaInput.addEventListener('blur', function() {
-        // slight delay to allow place_changed to run first if applicable
-        setTimeout(() => {
-            updateDestinoOptions().catch(() => {});
-        }, 150);
-    });
+        // If user leaves the partida field (blur), try to update destinos (will geocode if needed)
+        partidaInput.addEventListener('blur', function() {
+            // slight delay to allow place_changed to run first if applicable
+            setTimeout(() => {
+                updateDestinoOptions().catch(() => {});
+            }, 150);
+        });
+    }
+
+    // Listeners equivalentes para os campos da etapa-2 (results-origin/results-destino)
+    const resultsDestinoSelect = document.getElementById('results-destino');
+    if (resultsDestinoSelect) {
+        resultsDestinoSelect.addEventListener('focus', function() {
+            updateDestinoOptionsFor(resultsOriginInput || partidaInput, resultsDestinoSelect, autocompleteResults || autocomplete)
+                .catch(() => {});
+        });
+        resultsDestinoSelect.addEventListener('change', function () {
+            const sel = this.selectedOptions && this.selectedOptions[0];
+            if (!sel || !sel.value) return;
+
+            const placeholder = this.querySelector('option[hidden]');
+            if (placeholder) {
+                try { placeholder.hidden = true; placeholder.disabled = true; placeholder.selected = false; } catch (e) {}
+            }
+            try {
+                const opts = Array.from(this.options || []);
+                const idx = opts.indexOf(sel);
+                if (idx >= 0) {
+                    this.selectedIndex = idx;
+                } else {
+                    this.value = sel.value;
+                }
+            } catch (e) {
+                try { this.value = sel.value; } catch (err) {}
+            }
+            console.log('[troop] results destino change - selected value:', this.value, 'selectedIndex:', this.selectedIndex);
+        });
+    }
+
+    if (resultsOriginInput) {
+        resultsOriginInput.addEventListener('blur', function () {
+            setTimeout(() => {
+                updateDestinoOptionsFor(resultsOriginInput, resultsDestinoSelect, autocompleteResults)
+                    .catch(() => {});
+            }, 150);
+        });
+    }
 
     // Antes de renderMotoristas e inicializarMapaERotas, defina bairros fictícios:
     const bairrosFicticios = [
@@ -562,91 +780,110 @@ document.addEventListener("DOMContentLoaded", function () {
         { nome: "Areal", lat: -31.7550, lng: -52.3500 }
     ];
 
-    // Renderiza os cards de motoristas
-    function renderMotoristas() {
-        const cardsContainer = document.getElementById('motoristas-cards');
-        cardsContainer.innerHTML = "";
+    // Estado de filtro da lista de motoristas ("", "cheapest", "rating", "seats")
+    let activeDriverFilter = "";
 
-        // Se não foi selecionado endereço de partida e escola, mostra todas as rotas saindo de bairros diferentes
-        let origemCustomizada = false;
-        if (!partidaCoords || !document.getElementById('destino').value) {
-            motoristasPorRota.forEach((rotaObj, idx) => {
-                rotaObj.origem = {
-                    lat: bairrosFicticios[idx % bairrosFicticios.length].lat,
-                    lng: bairrosFicticios[idx % bairrosFicticios.length].lng
-                };
-            });
-            origemCustomizada = true;
-        } else {
-            // Distribui as vans em pontos distintos dentro do raio de 3km
-            const raioKm = 3;
-            const raioGraus = raioKm / 111; // Aproximadamente 1 grau = 111km
-            
-            motoristasPorRota.forEach((rotaObj, idx) => {
-                // Calcula ângulos distintos para cada van (distribui uniformemente)
-                const angulo = (idx * (360 / motoristasPorRota.length)) * (Math.PI / 180);
-                // Varia a distância para criar mais diversidade
-                const distancia = raioGraus * (0.3 + (idx % 3) * 0.35); // Entre 30% e 95% do raio
-                
-                rotaObj.origem = {
-                    lat: partidaCoords.lat + Math.cos(angulo) * distancia,
-                    lng: partidaCoords.lng + Math.sin(angulo) * distancia
-                };
-            });
-            origemCustomizada = true;
+    // Renderiza os cards de motoristas no dashboard de comparação
+    function renderMotoristas() {
+        const listEl = document.getElementById('drivers-list');
+        const countEl = document.getElementById('drivers-count');
+        if (!listEl) return;
+
+        listEl.innerHTML = "";
+
+        // Nenhuma rota retornada: mostra estado vazio amigável
+        if (!motoristasPorRota || motoristasPorRota.length === 0) {
+            if (countEl) countEl.textContent = '';
+            listEl.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-center text-muted-foreground px-4">
+                    <div class="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-troop-light-gray">
+                        <svg class="h-8 w-8 text-troop-purple" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><path d="M16 8h4a2 2 0 0 1 2 2v6"/><path d="M3 21h18"/><path d="M6 18h.01"/><path d="M10 18h.01"/></svg>
+                    </div>
+                    <p class="text-sm font-medium text-troop-dark-gray mb-1">Ainda não temos vans para essa rota.</p>
+                    <p class="text-xs text-muted-foreground">Que tal sugerir uma nova?</p>
+                </div>
+            `;
+            return;
         }
 
-        motoristasPorRota.forEach((rotaObj, idx) => {
+        // Flatten: cada rota pode ter um ou mais motoristas (normalmente 1)
+        let items = [];
+        motoristasPorRota.forEach((rotaObj, rotaIdx) => {
             rotaObj.motoristas.forEach((motorista, mIdx) => {
-                // Horários diferentes: manhã, tarde, noite
-                const horariosPossiveis = ["07:00 (Manhã)", "14:00 (Tarde)", "19:00 (Noite)"];
-                const horario = horariosPossiveis[idx % horariosPossiveis.length];
+                const price = typeof motorista.preco === 'number' ? motorista.preco : null;
+                const seats = typeof motorista.vagas === 'number' ? motorista.vagas : null;
+                const rating = typeof motorista.nota === 'number' ? motorista.nota : null;
+                items.push({ rotaIdx, mIdx, rotaObj, motorista, price, seats, rating });
+            });
+        });
 
-                // Pontos de parada reais (usados no mapa)
-                let paradas = [];
-                if (rotaObj.rota === "Escola de Inglês") {
-                    paradas.push({ nome: "Escola de Inglês", cor: rotaObj.cor });
-                    if (mIdx === 0) paradas.push({ nome: "Show (Evento)", cor: "#22c55e" });
-                }
-                if (rotaObj.rota === "Show (Evento)") paradas.push({ nome: "Show (Evento)", cor: rotaObj.cor });
+        // Aplica filtros/ordenação simples
+        if (activeDriverFilter === 'cheapest') {
+            items.sort((a, b) => {
+                const pa = a.price ?? Number.POSITIVE_INFINITY;
+                const pb = b.price ?? Number.POSITIVE_INFINITY;
+                return pa - pb;
+            });
+        } else if (activeDriverFilter === 'rating') {
+            items.sort((a, b) => {
+                const ra = a.rating ?? 0;
+                const rb = b.rating ?? 0;
+                return rb - ra;
+            });
+        } else if (activeDriverFilter === 'seats') {
+            items.sort((a, b) => {
+                const sa = a.seats ?? 0;
+                const sb = b.seats ?? 0;
+                return sb - sa;
+            });
+        }
 
-                // Detalhe do trajeto: mostra bolinhas coloridas dos pontos de parada
-                let trajeto = `Origem`;
-                if (paradas.length > 0) {
-                    trajeto += " ";
-                    trajeto += paradas.map(escola =>
-                        `<span class="inline-block align-middle mr-1">
-                            <span class="h-2 w-2 rounded-full inline-block mr-1" style="background:${escola.cor};border:1.5px solid #333"></span>
-                            <span>${escola.nome}</span>
-                        </span>`
-                    ).join(" ");
-                    trajeto += " - SENAC";
-                } else {
-                    trajeto += " - SENAC";
-                }
+        if (countEl) countEl.textContent = `${items.length} opção${items.length === 1 ? '' : 'es'}`;
 
-                const card = document.createElement('div');
-                card.className = "bg-troop-white rounded-xl shadow-lg p-6 flex flex-col items-center";
-                card.innerHTML = `
-                    <div class="flex items-center mb-2">
-                        <span class="inline-block h-3 w-3 rounded-full mr-2" style="background:${rotaObj.cor}"></span>
-                        <span class="font-bold text-lg">${motorista.nome}</span>
+        items.forEach(({ rotaIdx, mIdx, rotaObj, motorista, price, seats, rating }) => {
+            const displayPrice = price != null ? `R$ ${price.toFixed(2)}` : 'Preço a combinar';
+            const displaySeats = seats != null ? `${seats} vaga${seats === 1 ? '' : 's'} disponíveis` : 'Vagas sob consulta';
+            const displayRating = rating != null ? rating.toFixed(1) : 'N/A';
+
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = "driver-card w-full text-left bg-troop-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-3 flex gap-3 items-center";
+            card.setAttribute('data-rota-idx', String(rotaIdx));
+            card.setAttribute('data-motorista-idx', String(mIdx));
+
+            card.innerHTML = `
+                <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full overflow-hidden border-2" style="border-color:${rotaObj.cor}">
+                        <img src="${motorista.foto}" alt="${motorista.nome}" class="h-full w-full object-cover" />
                     </div>
-                    <div class="flex items-center mb-2">
-                        <img src="${motorista.foto}" alt="${motorista.nome}" class="h-12 w-12 rounded-full object-cover mr-4" style="border-color:${rotaObj.cor};border-width:2px;border-style:solid;">
-                        <div class="flex-1 text-left">
-                            <div class="font-semibold">${motorista.veiculo} • ${motorista.placa}</div>
-                            <div class="text-xs text-muted-foreground">${trajeto}</div>
-                            <div class="text-xs text-troop-purple font-bold mt-1">Horário: ${horario}</div>
+                </div>
+                <div class="flex-1 flex flex-col gap-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="font-semibold text-xs md:text-sm text-troop-dark-gray truncate">${motorista.nome}</span>
+                        <span class="text-xs md:text-sm font-bold text-troop-purple whitespace-nowrap">${displayPrice}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1 text-[11px] text-muted-foreground truncate">
+                            <span class="inline-flex h-2 w-2 rounded-full" style="background:${rotaObj.cor}"></span>
+                            <span class="truncate">${rotaObj.rota}</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-[11px] text-amber-500">
+                            ${[1,2,3,4,5].map(i => `<svg class="h-3 w-3 ${rating && rating >= i ? '' : 'opacity-30'}" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><polygon points=\"12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2\"/></svg>`).join('')}
+                            <span class="text-[10px] ml-1 text-muted-foreground">${displayRating}</span>
                         </div>
                     </div>
-                    <button class="motorista-card w-full bg-troop-purple text-troop-white font-bold py-2 px-4 rounded-lg mt-2 hover:bg-troop-purple/90 transition-colors"
-                        data-rota="${rotaObj.rota}" data-idx="${idx}" data-motorista="${mIdx}">
-                        Selecionar
-                    </button>
-                `;
-                cardsContainer.appendChild(card);
+                    <div class="flex items-center justify-between gap-2 mt-0.5">
+                        <span class="text-[11px] text-muted-foreground truncate">${displaySeats}</span>
+                        <span class="text-[11px] font-semibold text-troop-purple">Ver detalhes</span>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', function() {
+                highlightRouteOnMap(rotaIdx, mIdx);
             });
+
+            listEl.appendChild(card);
         });
     }
 
@@ -655,7 +892,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Define o centro do mapa baseado no endereço de partida se disponível
         const mapCenter = partidaCoords || { lat: -31.7654, lng: -52.3371 };
         const mapZoom = partidaCoords ? 14 : 12; // Zoom ideal para ver círculo de 1km se há endereço selecionado
-        
+
         map = new google.maps.Map(document.getElementById("map"), {
             center: mapCenter,
             zoom: mapZoom,
@@ -767,8 +1004,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     suppressMarkers: true,
                     polylineOptions: {
                         strokeColor: rotaObj.cor,
-                        strokeOpacity: 0.9,
-                        strokeWeight: 6
+                        strokeOpacity: 0.6,
+                        strokeWeight: 5
                     }
                 });
                 routeRenderers.push(renderer);
@@ -922,21 +1159,16 @@ document.addEventListener("DOMContentLoaded", function () {
         // Legenda das vans
         adicionarLegendaVans();
 
-        // Ao clicar no botão do motorista, mostra só a rota dele
-        document.querySelectorAll('.motorista-card').forEach((btn) => {
-            btn.addEventListener('click', function() {
-                routeRenderers.forEach(r => r.setMap(null));
-                const idx = parseInt(this.getAttribute('data-idx'));
-                const mIdx = parseInt(this.getAttribute('data-motorista'));
-                const motorista = motoristasPorRota[idx].motoristas[mIdx];
-                if (motorista.renderer) {
-                    motorista.renderer.setMap(map);
-                }
-                document.getElementById('etapa-2').classList.add('hidden');
-                document.getElementById('planos').classList.remove('hidden');
-                document.getElementById('planos').scrollIntoView({behavior: "smooth"});
-            });
-        });
+        // Botão flutuante de recentralizar
+        const recenterBtn = document.getElementById('btn-recentralizar');
+        if (recenterBtn) {
+            recenterBtn.onclick = function(e) {
+                e.preventDefault();
+                const center = partidaCoords || { lat: -31.7654, lng: -52.3371 };
+                map.setCenter(center);
+                map.setZoom(partidaCoords ? 14 : 12);
+            };
+        }
     }
 
     // Adiciona legenda das vans no mapa
@@ -959,16 +1191,97 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             `).join('')}
         `;
-        // Adiciona legenda dentro do container do mapa
-        document.querySelector('.relative.rounded-xl.overflow-hidden.shadow-lg.h-96').appendChild(legend);
+        // Adiciona legenda dentro do container do mapa do dashboard
+        const shell = document.getElementById('results-map-shell');
+        (shell || document.body).appendChild(legend);
     }
 
-    // Botão de buscar rotas - agora consulta o backend via `troopApi.fetchRoutes`
-    document.getElementById('btn-etapa-1').onclick = async function(e) {
-        e.preventDefault();
-        const origin = document.getElementById('partida').value || '';
-        const destination = document.getElementById('destino').value || '';
+    // Destaque de rota no mapa ao clicar no card
+    function highlightRouteOnMap(rotaIdx, mIdx) {
+        if (!map || !motoristasPorRota[rotaIdx]) return;
 
+        // Reset de todas as rotas para o estilo padrão
+        motoristasPorRota.forEach((rotaObj) => {
+            rotaObj.motoristas.forEach((m) => {
+                if (m.renderer) {
+                    m.renderer.setOptions({
+                        polylineOptions: {
+                            strokeColor: rotaObj.cor,
+                            strokeOpacity: 0.6,
+                            strokeWeight: 5
+                        }
+                    });
+                }
+            });
+        });
+
+        const rota = motoristasPorRota[rotaIdx];
+        const motorista = rota && rota.motoristas[mIdx];
+        if (!rota || !motorista || !motorista.renderer || !motorista.directions) return;
+
+        motorista.renderer.setOptions({
+            polylineOptions: {
+                strokeColor: '#322275',
+                strokeOpacity: 0.95,
+                strokeWeight: 6
+            }
+        });
+
+        const route = motorista.directions.routes && motorista.directions.routes[0];
+        if (route && route.bounds) {
+            map.fitBounds(route.bounds);
+        }
+
+        const leg = route && route.legs && route.legs[0];
+        const position = leg && leg.start_location ? leg.start_location : map.getCenter();
+
+        const price = typeof motorista.preco === 'number' ? `R$ ${motorista.preco.toFixed(2)}` : 'Preço a combinar';
+        const seats = typeof motorista.vagas === 'number' ? `${motorista.vagas} vaga${motorista.vagas === 1 ? '' : 's'} disponíveis` : 'Vagas sob consulta';
+        const rating = typeof motorista.nota === 'number' ? motorista.nota.toFixed(1) : 'N/A';
+
+        if (!window._troopInfoWindow) {
+            window._troopInfoWindow = new google.maps.InfoWindow();
+        }
+        const html = `
+            <div style="padding:8px;max-width:220px;">
+                <div style="font-weight:600;color:#322275;margin-bottom:2px;">${motorista.nome}</div>
+                <div style="font-size:12px;margin-bottom:2px;">${rota.rota}</div>
+                <div style="font-size:12px;margin-bottom:2px;"><strong>${price}</strong></div>
+                <div style="font-size:11px;margin-bottom:2px;">${seats}</div>
+                <div style="font-size:11px;color:#f59e0b;">Nota: ${rating}</div>
+            </div>
+        `;
+        window._troopInfoWindow.setContent(html);
+        window._troopInfoWindow.setPosition(position);
+        window._troopInfoWindow.open(map);
+    }
+
+    // Helpers de autenticação e busca
+    function getAuthToken() {
+        try {
+            return localStorage.getItem('troop_token');
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function saveTempSearch(search) {
+        try {
+            sessionStorage.setItem('temp_search', JSON.stringify(search));
+        } catch (err) {}
+    }
+
+    function readTempSearch() {
+        try {
+            const raw = sessionStorage.getItem('temp_search');
+            if (!raw) return null;
+            return JSON.parse(raw);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    async function fetchAndPopulateRoutes(origin, destination) {
         try {
             // fetchRoutes retorna objeto JSON (ex: { routes: [...] }) ou array
             const resp = await (window.troopApi ? window.troopApi.fetchRoutes({ origin, destination }) : Promise.reject(new Error('API helper não carregado')));
@@ -977,44 +1290,406 @@ document.addEventListener("DOMContentLoaded", function () {
             else if (resp.routes) routesList = resp.routes;
 
             // Mapear rotas do backend para o formato esperado pelo frontend (motoristasPorRota)
-            // esqueleto: { rota, cor, origem: {lat,lng}, destino: {lat,lng}, motoristas: [{nome,foto,veiculo,placa}] }
             const colors = ['#2563eb','#22c55e','#a21caf','#ff7f50','#f59e0b'];
-            // Limpa array existente e popula com novos itens
             motoristasPorRota.length = 0;
             routesList.forEach((r, i) => {
+                const totalSeats = typeof r.seatCapacity === 'number' ? r.seatCapacity : null;
+                const booked = Array.isArray(r.bookings) ? r.bookings.length : 0;
+                const availableSeats = totalSeats != null ? Math.max(0, totalSeats - booked) : null;
+
+                // Preço e nota: o backend ainda não persiste preço/nota, então aqui usamos
+                // valores derivados/simulados apenas para fins de comparação visual.
+                const simulatedBasePrice = 20; // valor base simbólico
+                const price = typeof r.price === 'number' ? r.price : simulatedBasePrice + i * 5;
+                const rating = 4 + (i % 3) * 0.3; // nota simulada entre ~4.0 e ~4.6
+
                 motoristasPorRota.push({
                     rota: r.destination || r.destination,
                     cor: colors[i % colors.length],
                     origem: { lat: (r.originLat || r.origin?.lat) || -31.7654, lng: (r.originLng || r.origin?.lng) || -52.3371 },
                     destino: { lat: (r.destinationLat || r.destination?.lat) || -31.7800, lng: (r.destinationLng || r.destination?.lng) || -52.3400 },
-                    motoristas: [ { nome: r.driver?.name || `Motorista ${i+1}`, foto: 'https://randomuser.me/api/portraits/lego/1.jpg', veiculo: r.vehicle || 'Van', placa: r.id ? `R${r.id}` : '---' } ]
+                    motoristas: [ {
+                        nome: r.driver?.name || `Motorista ${i+1}`,
+                        foto: 'https://randomuser.me/api/portraits/lego/1.jpg',
+                        veiculo: r.vehicle || 'Van',
+                        placa: r.id ? `R${r.id}` : '---',
+                        preco: price,
+                        vagas: availableSeats,
+                        nota: rating
+                    } ]
                 });
             });
         } catch (err) {
             console.error('Erro ao buscar rotas:', err);
-            // Mantém a UI funcional com dados fictícios, mas avisa o usuário
             alert('Não foi possível buscar rotas do servidor. Mostrando resultados locais.');
+            throw err;
         }
+    }
 
-        document.getElementById('etapa-1').classList.add('hidden');
-        document.getElementById('etapa-2').classList.remove('hidden');
+    function goToEtapa2() {
+        const etapa1 = document.getElementById('etapa-1');
+        const etapa2 = document.getElementById('etapa-2');
+        if (etapa1 && etapa2) {
+            etapa1.classList.add('hidden');
+            etapa2.classList.remove('hidden');
+        }
+        try {
+            const logoEl = document.getElementById('header-logo');
+            const loginEl = document.getElementById('header-login');
+            const mobileMenu = document.querySelector('.md\\:hidden');
+            if (logoEl) logoEl.classList.add('hidden');
+            if (loginEl) loginEl.classList.add('hidden');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+        } catch (err) { /* ignore */ }
         renderMotoristas();
         inicializarMapaERotas();
+    }
+
+    function restoreSearchFromSession() {
+        const temp = readTempSearch();
+        if (!temp) return;
+
+        const originInput = document.getElementById('partida');
+        const destinoSelect = document.getElementById('destino');
+        const dateInput = document.getElementById('data');
+
+        if (originInput && temp.origin) originInput.value = temp.origin;
+        if (destinoSelect && temp.destination) destinoSelect.value = temp.destination;
+        if (dateInput && temp.date) dateInput.value = temp.date;
+
+        const token = getAuthToken();
+        if (!token) return;
+
+        fetchAndPopulateRoutes(temp.origin, temp.destination)
+            .then(() => {
+                goToEtapa2();
+                try { sessionStorage.removeItem('temp_search'); } catch (err) {}
+            })
+            .catch(() => {
+                // erros já foram tratados no fetchAndPopulateRoutes
+            });
+    }
+
+    // Botão de buscar rotas
+    document.getElementById('btn-etapa-1').onclick = async function(e) {
+        e.preventDefault();
+        const originInput = document.getElementById('partida');
+        const destinoSelect = document.getElementById('destino');
+        const dateInput = document.getElementById('data');
+
+        const origin = originInput && originInput.value ? originInput.value.trim() : '';
+        const destination = destinoSelect && destinoSelect.value ? destinoSelect.value : '';
+        const date = dateInput && dateInput.value ? dateInput.value : '';
+
+        const token = getAuthToken();
+
+        // Sempre abre o login sobreposto quando não estiver logado,
+        // mesmo que origem/destino estejam vazios.
+        if (!token) {
+            saveTempSearch({ origin, destination, date });
+            loginFlowContext = 'buscar';
+            showLoginModal();
+            return;
+        }
+
+        // Se já estiver logado, aí sim fazemos a validação e a busca real
+        let invalid = false;
+        if (originInput) originInput.classList.remove('border-red-500');
+        if (destinoSelect) destinoSelect.classList.remove('border-red-500');
+
+        if (!origin && originInput) {
+            originInput.classList.add('border-red-500');
+            originInput.focus();
+            invalid = true;
+        }
+        if (!destination && destinoSelect) {
+            destinoSelect.classList.add('border-red-500');
+            if (!invalid) destinoSelect.focus();
+            invalid = true;
+        }
+        if (invalid) {
+            alert('Por favor, selecione um endereço de partida e uma rota antes de prosseguir.');
+            return;
+        }
+
+        saveTempSearch({ origin, destination, date });
+        await fetchAndPopulateRoutes(origin, destination);
+        goToEtapa2();
     };
 
+    // Submissão da barra de busca da etapa-2 (dashboard)
+    const resultsSearchForm = document.getElementById('results-search-form');
+    if (resultsSearchForm) {
+        resultsSearchForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const originInput = document.getElementById('results-origin');
+            const destinoSelect = document.getElementById('results-destino');
+            const dateInput = document.getElementById('results-date');
+
+            const origin = originInput && originInput.value ? originInput.value.trim() : '';
+            const destination = destinoSelect && destinoSelect.value ? destinoSelect.value : '';
+            const date = dateInput && dateInput.value ? dateInput.value : '';
+
+            // Validação simples: origem e destino obrigatórios para nova busca
+            if (!origin || !destination) {
+                alert('Informe origem e destino para atualizar a busca.');
+                return;
+            }
+
+            saveTempSearch({ origin, destination, date });
+            try {
+                await fetchAndPopulateRoutes(origin, destination);
+                renderMotoristas();
+                inicializarMapaERotas();
+            } catch (err) {
+                // erros já tratados dentro de fetchAndPopulateRoutes
+            }
+        });
+    }
+
+    // Show the inline login modal (tela de login/cadastro sobreposta)
+    function showLoginModal() {
+        const backdrop = document.getElementById('login-modal-backdrop');
+        if (!backdrop) return;
+        backdrop.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        const email = document.getElementById('login-email');
+        if (email) email.focus();
+    }
+
+    function closeLoginModal() {
+        const backdrop = document.getElementById('login-modal-backdrop');
+        if (!backdrop) return;
+        backdrop.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    // Called after successful modal login specifically quando o fluxo veio do botão "BUSCAR ROTAS"
+    function finishModalLoginAndProceed() {
+        closeLoginModal();
+        document.getElementById('etapa-1').classList.add('hidden');
+        document.getElementById('etapa-2').classList.remove('hidden');
+        try {
+            const logoEl = document.getElementById('header-logo');
+            const loginEl = document.getElementById('header-login');
+            const mobileMenu = document.querySelector('.md\\:hidden');
+            if (logoEl) logoEl.classList.add('hidden');
+            if (loginEl) loginEl.classList.add('hidden');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+        } catch (err) {}
+        renderMotoristas();
+        inicializarMapaERotas();
+    }
+
     // Destination select is updated by `updateDestinoOptions` when focused or clicked.
+
+    // Botão Login do header / estado logado
+    try {
+        const headerLogin = document.getElementById('header-login');
+        if (headerLogin) {
+            const hasToken = (function(){ try { return !!localStorage.getItem('troop_token'); } catch (err) { return false; } })();
+            if (hasToken) {
+                let userName = null;
+                try { userName = localStorage.getItem('user_name'); } catch (err) {}
+                headerLogin.textContent = userName || 'Minha conta';
+                headerLogin.href = '#';
+                headerLogin.addEventListener('click', function(e){ e.preventDefault(); });
+
+                const parent = headerLogin.parentElement;
+                if (parent) {
+                    const logoutBtn = document.createElement('button');
+                    logoutBtn.type = 'button';
+                    logoutBtn.textContent = 'Sair';
+                    logoutBtn.className = 'ml-2 border border-troop-white/70 text-troop-white bg-transparent hover:bg-troop-white/10 font-bold py-2 px-4 rounded-full text-sm';
+                    logoutBtn.addEventListener('click', function(e){
+                        e.preventDefault();
+                        try {
+                            localStorage.removeItem('troop_token');
+                            localStorage.removeItem('troop_logged_in');
+                            localStorage.removeItem('user_name');
+                            localStorage.removeItem('troop_role');
+                            sessionStorage.removeItem('temp_search');
+                        } catch (err) {}
+                        window.location.href = 'index.html';
+                    });
+                    parent.appendChild(logoutBtn);
+                }
+            } else {
+                // Usuário não logado: abre tela de login/cadastro sobreposta
+                headerLogin.addEventListener('click', function(e){
+                    e.preventDefault();
+                    loginFlowContext = 'header';
+                    showLoginModal();
+                });
+            }
+        }
+    } catch (err) { /* ignore */ }
 
     // Botão selecionar plano
     document.querySelectorAll('.selecionar-plano').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = "login.html";
+            // Para planos, podemos apenas abrir a tela de login/cadastro sobreposta
+            loginFlowContext = 'header';
+            showLoginModal();
         });
     });
+
+    // Wiring da tela de login/cadastro sobreposta
+    try {
+        const modalCloseBtn = document.getElementById('loginModalClose');
+        const modalCancelBtn = document.getElementById('loginModalCancel');
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeLoginModal);
+        if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeLoginModal);
+
+        function setLoginMode(mode) {
+            const isLogin = mode === 'login';
+            if (!loginForm || !registerForm || !tabLogin || !tabRegister) return;
+            if (isLogin) {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                tabLogin.classList.add('bg-troop-purple','text-troop-white','shadow-md');
+                tabRegister.classList.remove('bg-troop-purple','text-troop-white','shadow-md');
+                tabRegister.classList.add('text-troop-dark-gray');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                tabRegister.classList.add('bg-troop-purple','text-troop-white','shadow-md');
+                tabLogin.classList.remove('bg-troop-purple','text-troop-white','shadow-md');
+                tabLogin.classList.add('text-troop-dark-gray');
+            }
+        }
+
+        if (tabLogin) tabLogin.addEventListener('click', function(e){ e.preventDefault(); setLoginMode('login'); });
+        if (tabRegister) tabRegister.addEventListener('click', function(e){ e.preventDefault(); setLoginMode('register'); });
+
+        // modo padrão quando o modal é carregado
+        setLoginMode('login');
+    } catch (err) { /* ignore */ }
+
+    // Callback global utilizado por auth.js quando o login é feito no modal desta página
+    window.handleLoginSuccess = async function(data) {
+        const temp = readTempSearch();
+        const cameFromSearch = (loginFlowContext === 'buscar');
+        loginFlowContext = null;
+
+        // Sempre reaproveita o que estiver em temp_search nos campos da etapa 1,
+        // mesmo que o usuário tenha clicado em BUSCAR com campos vazios ou parciais.
+        const originInput = document.getElementById('partida');
+        const destinoSelect = document.getElementById('destino');
+        const dateInput = document.getElementById('data');
+
+        if (temp) {
+            if (originInput && typeof temp.origin === 'string') originInput.value = temp.origin;
+            if (destinoSelect && typeof temp.destination === 'string') destinoSelect.value = temp.destination;
+            if (dateInput && typeof temp.date === 'string') dateInput.value = temp.date;
+        }
+
+        // Só seguimos automaticamente para a etapa 2 se o fluxo veio do botão BUSCAR
+        // e se origem/destino estiverem preenchidos.
+        if (cameFromSearch && temp && temp.origin && temp.destination) {
+            closeLoginModal();
+            try {
+                await fetchAndPopulateRoutes(temp.origin, temp.destination);
+                goToEtapa2();
+                try { sessionStorage.removeItem('temp_search'); } catch (err) {}
+            } catch (err) {
+                // erros já foram tratados em fetchAndPopulateRoutes
+            }
+        } else {
+            // Sem origem/destino completos: apenas fecha o modal e mantém o usuário na etapa 1
+            // com os campos já restaurados (mesmo que vazios ou parciais).
+            closeLoginModal();
+        }
+    };
+
+    // Restaura busca temporária apenas se veio de login.html
+    try {
+        const fromLogin = sessionStorage.getItem('from_login');
+        if (fromLogin === '1') {
+            restoreSearchFromSession();
+            sessionStorage.removeItem('from_login');
+        } else {
+            // Se não veio da tela de login, limpa qualquer busca temporária ao recarregar
+            sessionStorage.removeItem('temp_search');
+        }
+    } catch (err) {}
 });
 </script>
+
+    <!-- Tela de Login/Cadastro sobreposta -->
+    <div id="login-modal-backdrop" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-strong p-8 md:p-10 relative">
+            <button id="loginModalClose" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg" aria-label="Fechar">✕</button>
+            <!-- Logo / Brand -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="h-14 w-14 bg-troop-white rounded-3xl shadow-2xl flex items-center justify-center mb-3">
+                    <img src="https://img.icons8.com/?size=100&id=QTQ1x0Wu6rnn&format=png&color=000000" alt="Van Escolar" class="h-10 w-10 object-contain drop-shadow-xl" />
+                </div>
+                <span class="font-horizon font-black text-3xl text-troop-purple tracking-wide">Troop</span>
+                <p class="mt-2 text-sm text-muted-foreground text-center">Faça login ou crie sua conta para continuar.</p>
+            </div>
+
+            <!-- Tabs / Toggle -->
+            <div class="flex mb-6 bg-troop-light-gray rounded-full p-1">
+                <button id="tab-login" class="flex-1 py-2.5 text-sm font-semibold rounded-full transition-all duration-200 bg-troop-purple text-troop-white shadow-md">Entrar</button>
+                <button id="tab-register" class="flex-1 py-2.5 text-sm font-semibold rounded-full transition-all duration-200 text-troop-dark-gray">Criar Conta</button>
+            </div>
+
+            <!-- Login form -->
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-email" class="block text-xs font-semibold text-troop-dark-gray mb-1">E-mail</label>
+                    <input id="login-email" type="email" required placeholder="seu@email.com" class="w-full border-2 border-muted rounded-lg px-4 py-3 text-sm text-troop-dark-gray focus:outline-none focus:border-troop-purple focus:ring-0 transition" />
+                </div>
+                <div>
+                    <label for="login-password" class="block text-xs font-semibold text-troop-dark-gray mb-1">Senha</label>
+                    <input id="login-password" type="password" required placeholder="Sua senha" class="w-full border-2 border-muted rounded-lg px-4 py-3 text-sm text-troop-dark-gray focus:outline-none focus:border-troop-purple focus:ring-0 transition" />
+                </div>
+                <div class="flex items-center justify-between text-xs mb-1">
+                    <span class="text-muted-foreground">Esqueceu sua senha?</span>
+                    <a href="#" class="text-troop-purple hover:underline">Recuperar acesso</a>
+                </div>
+                <button type="submit" class="w-full bg-troop-purple text-troop-white font-bold py-3 rounded-xl text-sm shadow-lg transform transition-all duration-200 hover:bg-troop-purple/90 hover:scale-[1.02]">Entrar</button>
+            </form>
+
+            <!-- Register form -->
+            <form id="register-form" class="space-y-4 hidden mt-1">
+                <div>
+                    <label for="reg-name" class="block text-xs font-semibold text-troop-dark-gray mb-1">Nome completo</label>
+                    <input id="reg-name" type="text" required placeholder="Seu nome" class="w-full border-2 border-muted rounded-lg px-4 py-3 text-sm text-troop-dark-gray focus:outline-none focus:border-troop-purple focus:ring-0 transition" />
+                </div>
+                <div>
+                    <label for="reg-email" class="block text-xs font-semibold text-troop-dark-gray mb-1">E-mail</label>
+                    <input id="reg-email" type="email" required placeholder="seu@email.com" class="w-full border-2 border-muted rounded-lg px-4 py-3 text-sm text-troop-dark-gray focus:outline-none focus:border-troop-purple focus:ring-0 transition" />
+                </div>
+                <div>
+                    <label for="reg-password" class="block text-xs font-semibold text-troop-dark-gray mb-1">Senha</label>
+                    <input id="reg-password" type="password" required placeholder="Crie uma senha segura" class="w-full border-2 border-muted rounded-lg px-4 py-3 text-sm text-troop-dark-gray focus:outline-none focus:border-troop-purple focus:ring-0 transition" />
+                </div>
+                <div>
+                    <label for="reg-role" class="block text-xs font-semibold text-troop-dark-gray mb-1">Tipo de usuário</label>
+                    <select id="reg-role" required class="w-full border-2 border-muted rounded-lg px-4 py-3 text-sm text-troop-dark-gray focus:outline-none focus:border-troop-purple focus:ring-0 transition bg-white">
+                        <option value="" disabled selected hidden>Selecione uma opção</option>
+                        <option value="passageiro">Passageiro</option>
+                        <option value="motorista">Motorista</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-troop-purple text-troop-white font-bold py-3 rounded-xl text-sm shadow-lg transform transition-all duração-200 hover:bg-troop-purple/90 hover:scale-[1.02]">Criar conta</button>
+            </form>
+
+            <button id="loginModalCancel" type="button" class="mt-4 w-full text-center text-xs text-muted-foreground hover:text-troop-purple hover:underline">Cancelar</button>
+        </div>
+    </div>
+
     <!-- Troop frontend scripts -->
-    <script src="js/api.js"></script>
+    <script type="module" src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>
