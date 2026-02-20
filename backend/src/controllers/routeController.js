@@ -269,17 +269,71 @@ export async function listRoutes(req, res) {
     const take = limit ? Math.min(100, Number(limit)) : 50;
     const skip = offset ? Math.max(0, Number(offset)) : 0;
 
-    const routes = await prisma.route.findMany({
+    let routes = await prisma.route.findMany({
       where,
       take,
       skip,
       orderBy: { departureAt: 'asc' },
       include: {
         driver: { select: { id: true, name: true, email: true } },
-        bookings: { select: { id: true, userId: true } },
         stops: { orderBy: { order: 'asc' }, select: { id: true, address: true, placeId: true, lat: true, lng: true, order: true } }
       }
     });
+
+    // Quando houver `date`, anexar as Trips desse dia para cada rota
+    if (date && routes.length) {
+      const d = new Date(date);
+      if (!Number.isNaN(d.getTime())) {
+        const dayStart = new Date(d);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(d);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const routeIds = routes.map(r => r.id);
+
+        const trips = await prisma.trip.findMany({
+          where: {
+            routeId: { in: routeIds },
+            scheduledTime: { gte: dayStart, lte: dayEnd },
+            status: { in: ['OPEN', 'FULL'] }
+          },
+          include: {
+            driver: { select: { id: true, name: true, email: true } },
+            _count: { select: { bookings: true } }
+          },
+          orderBy: { scheduledTime: 'asc' }
+        });
+
+        const tripsByRoute = new Map();
+        for (const t of trips) {
+          const list = tripsByRoute.get(t.routeId) || [];
+          list.push(t);
+          tripsByRoute.set(t.routeId, list);
+        }
+
+        routes = routes.map(route => {
+          const rawTrips = tripsByRoute.get(route.id) || [];
+          const mappedTrips = rawTrips.map(t => {
+            const seatsTotal = route.seatCapacity;
+            const seatsBooked = t._count?.bookings ?? 0;
+            const seatsAvailable = Math.max(0, seatsTotal - seatsBooked);
+            return {
+              id: t.id,
+              scheduledTime: t.scheduledTime,
+              status: t.status,
+              driver: t.driver,
+              seatsTotal,
+              seatsBooked,
+              seatsAvailable
+            };
+          });
+          return {
+            ...route,
+            trips: mappedTrips
+          };
+        });
+      }
+    }
 
     return res.status(200).json({ routes });
 
@@ -296,7 +350,7 @@ export async function getDriverRoutes(req, res, next) {
 
     const routes = await prisma.route.findMany({
       where: { driverId: Number(driverId) },
-      include: { _count: { select: { bookings: true } } },
+      include: { _count: { select: { trips: true } } },
       orderBy: { departureAt: 'desc' }
     });
 

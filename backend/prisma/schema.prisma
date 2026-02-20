@@ -14,6 +14,12 @@ enum UserRole {
   ADMIN
 }
 
+enum TripStatus {
+  OPEN
+  FULL
+  COMPLETED
+}
+
 model User {
   id           Int       @id @default(autoincrement())
   email        String    @unique
@@ -23,6 +29,7 @@ model User {
   role         UserRole  @default(PASSENGER)
   bookings     Booking[]
   routes       Route[] @relation("DriverRoutes")
+  tripsAsDriver Trip[] @relation("DriverTrips")
 }
 
 model Route {
@@ -44,7 +51,7 @@ model Route {
   published    Boolean   @default(false)
   driverId     Int?
   driver       User?     @relation("DriverRoutes", fields: [driverId], references: [id], onDelete: Cascade)
-  bookings     Booking[]
+  trips        Trip[]
 
   @@index([departureAt])
   @@index([origin, destination, departureAt])
@@ -54,15 +61,15 @@ model Route {
 model Booking {
   id        Int       @id @default(autoincrement())
   userId    Int
-  routeId   Int
+  tripId    Int
   status    String    @default("CONFIRMED")
   createdAt DateTime  @default(now())
 
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  route  Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  trip   Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, routeId], name: "unique_user_route_booking")
-  @@index([routeId])
+  @@unique([userId, tripId], name: "unique_user_trip_booking")
+  @@index([tripId])
 }
 
 // Stops / waypoints for Route
@@ -80,4 +87,20 @@ model Stop {
 
   @@index([routeId])
   @@index([routeId, order])
+}
+
+model Trip {
+  id            Int         @id @default(autoincrement())
+  routeId       Int
+  driverId      Int
+  scheduledTime DateTime
+  status        TripStatus  @default(OPEN)
+  createdAt     DateTime    @default(now())
+
+  route   Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  driver  User  @relation("DriverTrips", fields: [driverId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([routeId, scheduledTime])
+  @@index([driverId, scheduledTime])
 }
