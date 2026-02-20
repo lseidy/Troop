@@ -68,6 +68,11 @@ export async function apiGetRoutes(filters = {}) {
 
 export { BASE_URL };
 
+// Também expõe apiGetRoutes no escopo global para uso em scripts inline da homepage
+if (typeof window !== 'undefined') {
+  window.apiGetRoutes = apiGetRoutes;
+}
+
 // Simple API helper for Troop frontend
 (function () {
   const BASE = window.API_BASE || 'http://localhost:3000';

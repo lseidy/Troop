@@ -51,8 +51,8 @@
             color: #6B7280;
         }
     </style>
-    <!-- API do Google Maps -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu47mjnadIRWMqFq1lPw_qEBz6Ns3Ic7s&libraries=places"></script>
+    <!-- API do Google Maps (Places + Geometry para cálculos de distância) -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu47mjnadIRWMqFq1lPw_qEBz6Ns3Ic7s&libraries=places,geometry"></script>
 </head>
 <body class="font-lato bg-troop-white text-troop-dark-gray">
 
@@ -102,10 +102,7 @@
                             <div class="relative">
                                     <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                                     <select id="destino" class="pl-10 h-12 w-full border-2 border-muted rounded-md focus:border-troop-purple focus:ring-0 appearance-none bg-white text-troop-dark-gray">
-                                        <option value="" disabled selected hidden>Escolha a escola</option>
-                                        <option value="Escola de Inglês">Escola de Inglês</option>
-                                        <option value="Show (Evento)">Show (Evento)</option>
-                                        <option value="SENAC">SENAC</option>
+                                        <option value="" disabled selected hidden>Escolha a rota</option>
                                     </select>
                                 </div>
                                 <!-- Third field removed as requested -->
@@ -311,36 +308,8 @@
                     <div class="flex items-center space-x-3 mb-4">
     <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Dados dos motoristas por rota (removido um motorista e adicionados lugares fictícios das escolas)
-    const motoristasPorRota = [
-        {
-            rota: "Escola de Inglês",
-            cor: "#2563eb",
-            origem: { lat: -31.7654, lng: -52.3371 },
-            destino: { lat: -31.7800, lng: -52.3400 }, // Escola de Inglês fictícia
-            motoristas: [
-                { nome: "João Silva", foto: "https://randomuser.me/api/portraits/men/32.jpg", veiculo: "Van Sprinter", placa: "ABC-1234" }
-            ]
-        },
-        {
-            rota: "Show (Evento)",
-            cor: "#22c55e",
-            origem: { lat: -31.7654, lng: -52.3371 },
-            destino: { lat: -31.7500, lng: -52.3200 }, // Show (Evento) fictícia
-            motoristas: [
-                { nome: "Carlos Lima", foto: "https://randomuser.me/api/portraits/men/65.jpg", veiculo: "Van Boxer", placa: "JKL-4321" }
-            ]
-        },
-        {
-            rota: "SENAC",
-            cor: "#a21caf",
-            origem: { lat: -31.7616, lng: -52.3867 },
-            destino: { lat: -31.77019, lng: -52.34177 }, // SENAC fictício (será sobrescrito)
-            motoristas: [
-                { nome: "Fernanda Alves", foto: "https://randomuser.me/api/portraits/women/50.jpg", veiculo: "Van Renault Master", placa: "SEN-2025" }
-            ]
-        }
-    ];
+    // Lista de motoristas por rota será preenchida dinamicamente com dados reais do backend
+    const motoristasPorRota = [];
 
     let partidaCoords = null;
     let map, marker, directionsService, directionsRenderer, polylines = [];
@@ -720,7 +689,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const select = document.getElementById('destino');
             if (!select) return;
             select.innerHTML = '';
-            const ph = document.createElement('option'); ph.value=''; ph.disabled=true; ph.selected=true; ph.hidden=true; ph.textContent='Escolha a escola'; select.appendChild(ph);
+            const ph = document.createElement('option'); ph.value=''; ph.disabled=true; ph.selected=true; ph.hidden=true; ph.textContent='Escolha a rota'; select.appendChild(ph);
             partidaCoords = null; // reset coords until place selected or geocoded
         });
 
@@ -772,13 +741,31 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Antes de renderMotoristas e inicializarMapaERotas, defina bairros fictícios:
-    const bairrosFicticios = [
-        { nome: "Centro", lat: -31.7654, lng: -52.3371 },
-        { nome: "Fragata", lat: -31.7700, lng: -52.3400 },
-        { nome: "Três Vendas", lat: -31.7500, lng: -52.3200 },
-        { nome: "Areal", lat: -31.7550, lng: -52.3500 }
-    ];
+    // Skeleton de loading na barra lateral enquanto buscamos motoristas
+    function showDriversSkeleton(count = 3) {
+        const listEl = document.getElementById('drivers-list');
+        const countEl = document.getElementById('drivers-count');
+        if (!listEl) return;
+        if (countEl) countEl.textContent = '';
+
+        const skeletonCard = `
+            <div class="w-full bg-troop-white rounded-xl border border-gray-100 shadow-sm p-3 flex gap-3 items-center animate-pulse">
+                <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full bg-gray-200"></div>
+                </div>
+                <div class="flex-1 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="h-3 w-24 bg-gray-200 rounded"></div>
+                        <div class="h-3 w-16 bg-gray-200 rounded"></div>
+                    </div>
+                    <div class="h-3 w-32 bg-gray-200 rounded"></div>
+                    <div class="h-3 w-20 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        `;
+
+        listEl.innerHTML = new Array(count).fill(skeletonCard).join('');
+    }
 
     // Estado de filtro da lista de motoristas ("", "cheapest", "rating", "seats")
     let activeDriverFilter = "";
@@ -813,29 +800,42 @@ document.addEventListener("DOMContentLoaded", function () {
                 const price = typeof motorista.preco === 'number' ? motorista.preco : null;
                 const seats = typeof motorista.vagas === 'number' ? motorista.vagas : null;
                 const rating = typeof motorista.nota === 'number' ? motorista.nota : null;
-                items.push({ rotaIdx, mIdx, rotaObj, motorista, price, seats, rating });
+                const dist = typeof rotaObj.distKm === 'number' ? rotaObj.distKm : null;
+                items.push({ rotaIdx, mIdx, rotaObj, motorista, price, seats, rating, dist });
             });
         });
 
-        // Aplica filtros/ordenação simples
-        if (activeDriverFilter === 'cheapest') {
+        // Ordenação principal por proximidade (distância da casa do usuário), com filtros como critério secundário
+        function sortByDistanceThen(extraComparator) {
             items.sort((a, b) => {
+                const da = a.dist ?? Number.POSITIVE_INFINITY;
+                const db = b.dist ?? Number.POSITIVE_INFINITY;
+                if (da !== db) return da - db;
+                if (typeof extraComparator === 'function') return extraComparator(a, b);
+                return 0;
+            });
+        }
+
+        if (activeDriverFilter === 'cheapest') {
+            sortByDistanceThen((a, b) => {
                 const pa = a.price ?? Number.POSITIVE_INFINITY;
                 const pb = b.price ?? Number.POSITIVE_INFINITY;
                 return pa - pb;
             });
         } else if (activeDriverFilter === 'rating') {
-            items.sort((a, b) => {
+            sortByDistanceThen((a, b) => {
                 const ra = a.rating ?? 0;
                 const rb = b.rating ?? 0;
                 return rb - ra;
             });
         } else if (activeDriverFilter === 'seats') {
-            items.sort((a, b) => {
+            sortByDistanceThen((a, b) => {
                 const sa = a.seats ?? 0;
                 const sb = b.seats ?? 0;
                 return sb - sa;
             });
+        } else {
+            sortByDistanceThen();
         }
 
         if (countEl) countEl.textContent = `${items.length} opção${items.length === 1 ? '' : 'es'}`;
@@ -844,6 +844,18 @@ document.addEventListener("DOMContentLoaded", function () {
             const displayPrice = price != null ? `R$ ${price.toFixed(2)}` : 'Preço a combinar';
             const displaySeats = seats != null ? `${seats} vaga${seats === 1 ? '' : 's'} disponíveis` : 'Vagas sob consulta';
             const displayRating = rating != null ? rating.toFixed(1) : 'N/A';
+            const displayDist = typeof rotaObj.distKm === 'number' ? `${rotaObj.distKm.toFixed(1)} km da sua casa` : '';
+
+            const trips = Array.isArray(rotaObj.trips) ? rotaObj.trips : [];
+            const tripsCount = trips.length;
+            const nextTrip = tripsCount ? trips[0] : null;
+            let nextTripLabel = '';
+            if (nextTrip && nextTrip.scheduledTime) {
+                try {
+                    const dt = new Date(nextTrip.scheduledTime);
+                    nextTripLabel = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {}
+            }
 
             const card = document.createElement('button');
             card.type = 'button';
@@ -863,9 +875,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         <span class="text-xs md:text-sm font-bold text-troop-purple whitespace-nowrap">${displayPrice}</span>
                     </div>
                     <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-1 text-[11px] text-muted-foreground truncate">
-                            <span class="inline-flex h-2 w-2 rounded-full" style="background:${rotaObj.cor}"></span>
-                            <span class="truncate">${rotaObj.rota}</span>
+                        <div class="flex flex-col gap-0.5 text-[11px] text-muted-foreground truncate">
+                            <div class="flex items-center gap-1 truncate">
+                                <span class="inline-flex h-2 w-2 rounded-full" style="background:${rotaObj.cor}"></span>
+                                <span class="truncate">${rotaObj.rota}</span>
+                            </div>
+                            ${displayDist ? `<span class="truncate">${displayDist}</span>` : ''}
                         </div>
                         <div class="flex items-center gap-1 text-[11px] text-amber-500">
                             ${[1,2,3,4,5].map(i => `<svg class="h-3 w-3 ${rating && rating >= i ? '' : 'opacity-30'}" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><polygon points=\"12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2\"/></svg>`).join('')}
@@ -874,32 +889,72 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                     <div class="flex items-center justify-between gap-2 mt-0.5">
                         <span class="text-[11px] text-muted-foreground truncate">${displaySeats}</span>
-                        <span class="text-[11px] font-semibold text-troop-purple">Ver detalhes</span>
+                        <span class="text-[11px] font-semibold text-troop-purple">${tripsCount > 1 ? `${tripsCount} horários · Ver todos` : 'Ver detalhes'}</span>
                     </div>
+                    ${tripsCount ? `
+                    <div class="mt-1 text-[11px] text-muted-foreground">
+                        ${nextTripLabel ? `Próxima viagem hoje às <span class="font-semibold text-troop-dark-gray">${nextTripLabel}</span>` : ''}
+                    </div>
+                    <div id="trips-for-${rotaIdx}-${mIdx}" class="mt-1 space-y-1 hidden">
+                        ${trips.map((t, idx) => {
+                            let label = '';
+                            try {
+                                const dt = new Date(t.scheduledTime);
+                                label = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                            } catch (e) {}
+                            const vagas = typeof t.seatsAvailable === 'number'
+                                ? `${t.seatsAvailable} vaga${t.seatsAvailable === 1 ? '' : 's'}`
+                                : '';
+                            return `<div class=\"flex items-center justify-between border border-gray-100 rounded px-2 py-1 bg-gray-50\">
+                                        <span>${label}</span>
+                                        <span class=\"text-xs text-troop-purple font-semibold\">${vagas}</span>
+                                    </div>`;
+                        }).join('')}
+                    </div>
+                    ` : ''}
                 </div>
             `;
 
             card.addEventListener('click', function() {
+                // Ao clicar no card, destaca apenas a rota selecionada e expande/contrai a lista de viagens (se houver)
                 highlightRouteOnMap(rotaIdx, mIdx);
+                const tripsEl = document.getElementById(`trips-for-${rotaIdx}-${mIdx}`);
+                if (tripsEl) {
+                    tripsEl.classList.toggle('hidden');
+                }
             });
 
             listEl.appendChild(card);
         });
     }
 
-    // Cada motorista tem sua rota traçada no mapa ao clicar
-    function inicializarMapaERotas() {
-        // Define o centro do mapa baseado no endereço de partida se disponível
-        const mapCenter = partidaCoords || { lat: -31.7654, lng: -52.3371 };
-        const mapZoom = partidaCoords ? 14 : 12; // Zoom ideal para ver círculo de 1km se há endereço selecionado
+    // Cada motorista tem sua rota traçada no mapa ao clicar, usando apenas dados reais vindos do backend
+    let activeRouteRenderers = [];
+    let activeRouteMarkers = [];
+
+    function clearActiveRoutesFromMap() {
+        try {
+            activeRouteRenderers.forEach(r => r.setMap(null));
+            activeRouteRenderers = [];
+            activeRouteMarkers.forEach(m => m.setMap(null));
+            activeRouteMarkers = [];
+        } catch (e) {}
+    }
+
+    function ensureBaseMap() {
+        if (map && directionsService) return;
+        const defaultCenter = partidaCoords
+            || (motoristasPorRota[0] && motoristasPorRota[0].origem)
+            || { lat: -31.7654, lng: -52.3371 };
+        const defaultZoom = partidaCoords ? 14 : 12;
 
         map = new google.maps.Map(document.getElementById("map"), {
-            center: mapCenter,
-            zoom: mapZoom,
+            center: defaultCenter,
+            zoom: defaultZoom,
         });
         directionsService = new google.maps.DirectionsService();
 
-        // Adiciona círculo de 1km de raio ao redor do endereço de partida
+        // Círculo de 1km e marcador apenas se o usuário informou partida
         if (partidaCoords) {
             const circle = new google.maps.Circle({
                 strokeColor: '#322275',
@@ -909,23 +964,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 fillOpacity: 0.1,
                 map: map,
                 center: partidaCoords,
-                radius: 1000 // 1km em metros
+                radius: 1000
             });
-            
-            // Ajusta o zoom e centro do mapa para mostrar perfeitamente o círculo de 1km
+
             const bounds = circle.getBounds();
             map.fitBounds(bounds);
-            
-            // Força um zoom específico que seja ideal para visualizar 1km de raio
-            setTimeout(() => {
-                map.setZoom(14);
-            }, 100);
-            
-            // Adiciona marcador no centro (endereço de partida)
-            new google.maps.Marker({
+            setTimeout(() => { map.setZoom(14); }, 100);
+
+            const homeMarker = new google.maps.Marker({
                 position: partidaCoords,
                 map: map,
-                title: "Seu endereço de partida",
+                title: "Sua casa",
                 icon: {
                     path: google.maps.SymbolPath.CIRCLE,
                     scale: 10,
@@ -935,244 +984,32 @@ document.addEventListener("DOMContentLoaded", function () {
                     strokeWeight: 3
                 }
             });
+            activeRouteMarkers.push(homeMarker);
         }
 
-        let routeRenderers = [];
-        const enderecoSenac = "Rua Gonçalves Chaves, 604, Pelotas, RS";
-
-        // Coordenadas fictícias das escolas
-        const escolasCoords = {
-            "Escola de Inglês": { lat: -31.7800, lng: -52.3400 },
-            "Show (Evento)": { lat: -31.7500, lng: -52.3200 }
-        };
-
-        // Se não foi selecionado endereço de partida e escola, mostra todas as rotas saindo de bairros diferentes
-        if (!partidaCoords || !document.getElementById('destino').value) {
-            motoristasPorRota.forEach((rotaObj, idx) => {
-                rotaObj.origem = {
-                    lat: bairrosFicticios[idx % bairrosFicticios.length].lat,
-                    lng: bairrosFicticios[idx % bairrosFicticios.length].lng
-                };
-            });
-        } else {
-            // Distribui as vans em pontos distintos dentro do raio de 1km
-            const raioKm = 1;
-            const raioGraus = raioKm / 111; // Aproximadamente 1 grau = 111km
-            
-            motoristasPorRota.forEach((rotaObj, idx) => {
-                // Calcula ângulos distintos para cada van (distribui uniformemente)
-                const angulo = (idx * (360 / motoristasPorRota.length)) * (Math.PI / 180);
-                // Varia a distância para criar mais diversidade
-                const distancia = raioGraus * (0.3 + (idx % 3) * 0.35); // Entre 30% e 95% do raio
-                
-                rotaObj.origem = {
-                    lat: partidaCoords.lat + Math.cos(angulo) * distancia,
-                    lng: partidaCoords.lng + Math.sin(angulo) * distancia
-                };
-            });
-        }
-
-        motoristasPorRota.forEach((rotaObj, idx) => {
-            rotaObj.motoristas.forEach((motorista, mIdx) => {
-                let destinoFinal = enderecoSenac;
-                let waypoints = [];
-
-                // Motorista da Escola de Inglês faz Origem -> Escola de Inglês -> SENAC
-                if (rotaObj.rota === "Escola de Inglês") {
-                    waypoints.push({
-                        location: escolasCoords["Escola de Inglês"],
-                        stopover: true
-                    });
-                }
-                // Motorista do Show (Evento) faz Origem -> Show (Evento) -> SENAC
-                if (rotaObj.rota === "Show (Evento)") {
-                    waypoints.push({
-                        location: escolasCoords["Show (Evento)"],
-                        stopover: true
-                    });
-                }
-                // Exemplo extra: motorista da Escola A também passa pela Escola B antes do SENAC
-                if (rotaObj.rota === "Escola A" && mIdx === 0) {
-                    waypoints.push({
-                        location: escolasCoords["Escola B"],
-                        stopover: true
-                    });
-                }
-
-                const renderer = new google.maps.DirectionsRenderer({
-                    map: map,
-                    suppressMarkers: true,
-                    polylineOptions: {
-                        strokeColor: rotaObj.cor,
-                        strokeOpacity: 0.6,
-                        strokeWeight: 5
-                    }
-                });
-                routeRenderers.push(renderer);
-
-                // Adiciona marcador na origem da van
-                new google.maps.Marker({
-                    position: rotaObj.origem,
-                    map: map,
-                    title: `Van de ${motorista.nome} - ${rotaObj.rota}`,
-                    icon: {
-                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-                        scale: 6,
-                        fillColor: rotaObj.cor,
-                        fillOpacity: 1,
-                        strokeColor: '#FFFFFF',
-                        strokeWeight: 2
-                    }
-                });
-
-                directionsService.route({
-                    origin: rotaObj.origem,
-                    destination: destinoFinal,
-                    waypoints: waypoints,
-                    travelMode: google.maps.TravelMode.DRIVING
-                }, function(response, status) {
-                    if (status === google.maps.DirectionsStatus.OK) {
-                        renderer.setDirections(response);
-                        motorista.directions = response;
-                        motorista.renderer = renderer;
-
-                        // Adiciona marcadores para cada parada (waypoint)
-                        waypoints.forEach((wp, i) => {
-                            // Determina o nome da parada baseado nas coordenadas
-                            let nomeParada = 'Escola';
-                            for (const [nome, coords] of Object.entries(escolasCoords)) {
-                                if (Math.abs(coords.lat - wp.location.lat) < 0.001 && 
-                                    Math.abs(coords.lng - wp.location.lng) < 0.001) {
-                                    nomeParada = nome;
-                                    break;
-                                }
-                            }
-                            
-                            new google.maps.Marker({
-                                position: wp.location,
-                                map: map,
-                                icon: {
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    scale: 12,
-                                    fillColor: rotaObj.cor,
-                                    fillOpacity: 0.9,
-                                    strokeColor: "#FFFFFF",
-                                    strokeWeight: 3
-                                },
-                                title: `Parada: ${nomeParada}`,
-                                label: {
-                                    text: String(i + 1),
-                                    color: '#FFFFFF',
-                                    fontSize: '12px',
-                                    fontWeight: 'bold'
-                                }
-                            });
-                            
-                            // Adiciona InfoWindow com informações da parada
-                            const infoWindow = new google.maps.InfoWindow({
-                                content: `
-                                    <div style="padding: 8px;">
-                                        <h3 style="margin: 0; color: ${rotaObj.cor}; font-weight: bold;">${nomeParada}</h3>
-                                        <p style="margin: 4px 0; font-size: 12px;">Parada ${i + 1} da rota</p>
-                                        <p style="margin: 4px 0; font-size: 12px;">Motorista: ${motorista.nome}</p>
-                                        <p style="margin: 4px 0; font-size: 12px;">Veículo: ${motorista.veiculo}</p>
-                                    </div>
-                                `
-                            });
-                            
-                            // Cria o marcador da parada
-                            const paradaMarker = new google.maps.Marker({
-                                position: wp.location,
-                                map: map,
-                                icon: {
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    scale: 12,
-                                    fillColor: rotaObj.cor,
-                                    fillOpacity: 0.9,
-                                    strokeColor: "#FFFFFF",
-                                    strokeWeight: 3
-                                },
-                                title: `Parada: ${nomeParada}`,
-                                label: {
-                                    text: String(i + 1),
-                                    color: '#FFFFFF',
-                                    fontSize: '12px',
-                                    fontWeight: 'bold'
-                                }
-                            });
-                            
-                            // Adiciona evento de clique para mostrar InfoWindow
-                            paradaMarker.addListener('click', function() {
-                                infoWindow.open(map, paradaMarker);
-                            });
-                        });
-                    }
-                });
-
-                // Marcador de destino SENAC (apenas uma vez)
-                if (idx === 0 && mIdx === 0) {
-                    const geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ address: enderecoSenac }, function(results, status) {
-                        if (status === "OK" && results[0]) {
-                            const senacMarker = new google.maps.Marker({
-                                position: results[0].geometry.location,
-                                map: map,
-                                icon: {
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    scale: 15,
-                                    fillColor: '#ff6b35',
-                                    fillOpacity: 1,
-                                    strokeColor: '#FFFFFF',
-                                    strokeWeight: 3
-                                },
-                                title: "Destino Final: SENAC",
-                                label: {
-                                    text: 'D',
-                                    color: '#FFFFFF',
-                                    fontSize: '14px',
-                                    fontWeight: 'bold'
-                                }
-                            });
-                            
-                            // InfoWindow para o destino SENAC
-                            const senacInfoWindow = new google.maps.InfoWindow({
-                                content: `
-                                    <div style="padding: 8px;">
-                                        <h3 style="margin: 0; color: #ff6b35; font-weight: bold;">SENAC</h3>
-                                        <p style="margin: 4px 0; font-size: 12px;">Destino Final</p>
-                                        <p style="margin: 4px 0; font-size: 12px;">Todas as rotas chegam aqui</p>
-                                        <p style="margin: 4px 0; font-size: 10px; color: #666;">${enderecoSenac}</p>
-                                    </div>
-                                `
-                            });
-                            
-                            // Evento de clique para mostrar InfoWindow do SENAC
-                            senacMarker.addListener('click', function() {
-                                senacInfoWindow.open(map, senacMarker);
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
-        // Legenda das vans
-        adicionarLegendaVans();
-
-        // Botão flutuante de recentralizar
         const recenterBtn = document.getElementById('btn-recentralizar');
         if (recenterBtn) {
             recenterBtn.onclick = function(e) {
                 e.preventDefault();
-                const center = partidaCoords || { lat: -31.7654, lng: -52.3371 };
+                const center = partidaCoords
+                    || (motoristasPorRota[0] && motoristasPorRota[0].origem)
+                    || { lat: -31.7654, lng: -52.3371 };
                 map.setCenter(center);
                 map.setZoom(partidaCoords ? 14 : 12);
             };
         }
     }
 
+    function inicializarMapaERotas() {
+        ensureBaseMap();
+        // No carregamento inicial, mostramos apenas o mapa base; as rotas são desenhadas
+        // conforme o usuário clica nos cards (highlightRouteOnMap).
+        adicionarLegendaVans();
+    }
+
     // Adiciona legenda das vans no mapa
     function adicionarLegendaVans() {
+        if (!motoristasPorRota || motoristasPorRota.length === 0) return;
         // Remove legenda anterior se existir
         const oldLegend = document.getElementById('map-legend');
         if (oldLegend) oldLegend.remove();
@@ -1198,62 +1035,107 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Destaque de rota no mapa ao clicar no card
     function highlightRouteOnMap(rotaIdx, mIdx) {
-        if (!map || !motoristasPorRota[rotaIdx]) return;
+        if (!motoristasPorRota[rotaIdx]) return;
+        ensureBaseMap();
 
-        // Reset de todas as rotas para o estilo padrão
-        motoristasPorRota.forEach((rotaObj) => {
-            rotaObj.motoristas.forEach((m) => {
-                if (m.renderer) {
-                    m.renderer.setOptions({
-                        polylineOptions: {
-                            strokeColor: rotaObj.cor,
-                            strokeOpacity: 0.6,
-                            strokeWeight: 5
-                        }
-                    });
-                }
-            });
-        });
+        clearActiveRoutesFromMap();
 
         const rota = motoristasPorRota[rotaIdx];
         const motorista = rota && rota.motoristas[mIdx];
-        if (!rota || !motorista || !motorista.renderer || !motorista.directions) return;
+        if (!rota || !motorista || !rota.origem || !rota.destino) return;
 
-        motorista.renderer.setOptions({
+        // Desenha apenas a rota selecionada, com paradas reais como waypoints
+        const renderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: true,
             polylineOptions: {
                 strokeColor: '#322275',
                 strokeOpacity: 0.95,
                 strokeWeight: 6
             }
         });
+        activeRouteRenderers.push(renderer);
 
-        const route = motorista.directions.routes && motorista.directions.routes[0];
-        if (route && route.bounds) {
-            map.fitBounds(route.bounds);
-        }
+        const waypoints = Array.isArray(rota.stops)
+            ? rota.stops
+                .filter(s => s && isFinite(Number(s.lat)) && isFinite(Number(s.lng)))
+                .map(s => ({
+                    location: { lat: Number(s.lat), lng: Number(s.lng) },
+                    stopover: true
+                }))
+            : [];
 
-        const leg = route && route.legs && route.legs[0];
-        const position = leg && leg.start_location ? leg.start_location : map.getCenter();
+        directionsService.route({
+            origin: rota.origem,
+            destination: rota.destino,
+            waypoints,
+            travelMode: google.maps.TravelMode.DRIVING
+        }, function(response, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+                renderer.setDirections(response);
 
-        const price = typeof motorista.preco === 'number' ? `R$ ${motorista.preco.toFixed(2)}` : 'Preço a combinar';
-        const seats = typeof motorista.vagas === 'number' ? `${motorista.vagas} vaga${motorista.vagas === 1 ? '' : 's'} disponíveis` : 'Vagas sob consulta';
-        const rating = typeof motorista.nota === 'number' ? motorista.nota.toFixed(1) : 'N/A';
+                const route = response.routes && response.routes[0];
+                if (route && route.bounds) {
+                    map.fitBounds(route.bounds);
+                }
 
-        if (!window._troopInfoWindow) {
-            window._troopInfoWindow = new google.maps.InfoWindow();
-        }
-        const html = `
-            <div style="padding:8px;max-width:220px;">
-                <div style="font-weight:600;color:#322275;margin-bottom:2px;">${motorista.nome}</div>
-                <div style="font-size:12px;margin-bottom:2px;">${rota.rota}</div>
-                <div style="font-size:12px;margin-bottom:2px;"><strong>${price}</strong></div>
-                <div style="font-size:11px;margin-bottom:2px;">${seats}</div>
-                <div style="font-size:11px;color:#f59e0b;">Nota: ${rating}</div>
-            </div>
-        `;
-        window._troopInfoWindow.setContent(html);
-        window._troopInfoWindow.setPosition(position);
-        window._troopInfoWindow.open(map);
+                const leg = route && route.legs && route.legs[0];
+                const position = leg && leg.start_location ? leg.start_location : map.getCenter();
+
+                // Marcador na origem da rota
+                const originMarker = new google.maps.Marker({
+                    position: rota.origem,
+                    map: map,
+                    title: `Início da rota - ${rota.rota}`,
+                    icon: {
+                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                        scale: 6,
+                        fillColor: rota.cor,
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2
+                    }
+                });
+                activeRouteMarkers.push(originMarker);
+
+                // Marcador no destino final
+                const destMarker = new google.maps.Marker({
+                    position: rota.destino,
+                    map: map,
+                    title: `Destino - ${rota.rota}`,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#f97316',
+                        fillOpacity: 1,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 3
+                    }
+                });
+                activeRouteMarkers.push(destMarker);
+
+                const price = typeof motorista.preco === 'number' ? `R$ ${motorista.preco.toFixed(2)}` : 'Preço a combinar';
+                const seats = typeof motorista.vagas === 'number' ? `${motorista.vagas} vaga${motorista.vagas === 1 ? '' : 's'} disponíveis` : 'Vagas sob consulta';
+                const rating = typeof motorista.nota === 'number' ? motorista.nota.toFixed(1) : 'N/A';
+
+                if (!window._troopInfoWindow) {
+                    window._troopInfoWindow = new google.maps.InfoWindow();
+                }
+                const html = `
+                    <div style="padding:8px;max-width:240px;">
+                        <div style="font-weight:600;color:#322275;margin-bottom:2px;">${motorista.nome}</div>
+                        <div style="font-size:12px;margin-bottom:2px;">${rota.rota}</div>
+                        <div style="font-size:12px;margin-bottom:2px;"><strong>${price}</strong></div>
+                        <div style="font-size:11px;margin-bottom:2px;">${seats}</div>
+                        <div style="font-size:11px;color:#f59e0b;">Nota: ${rating}</div>
+                    </div>
+                `;
+                window._troopInfoWindow.setContent(html);
+                window._troopInfoWindow.setPosition(position);
+                window._troopInfoWindow.open(map);
+            }
+        });
+
     }
 
     // Helpers de autenticação e busca
@@ -1283,45 +1165,112 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function fetchAndPopulateRoutes(origin, destination) {
         try {
-            // fetchRoutes retorna objeto JSON (ex: { routes: [...] }) ou array
-            const resp = await (window.troopApi ? window.troopApi.fetchRoutes({ origin, destination }) : Promise.reject(new Error('API helper não carregado')));
+            // Mostra skeleton na barra lateral enquanto buscamos as rotas
+            showDriversSkeleton();
+            // Tenta usar apiGetRoutes (com autenticação) e cai para troopApi.fetchRoutes como fallback
+            let activeSearch = null;
+            try {
+                const raw = sessionStorage.getItem('active_search');
+                if (raw) activeSearch = JSON.parse(raw);
+            } catch (e) {}
+
+            const date = activeSearch && activeSearch.date ? activeSearch.date : undefined;
+
+            // apiGetRoutes retorna { routes } enquanto troopApi.fetchRoutes retorna diretamente o JSON
+            let resp;
+            if (window.apiGetRoutes) {
+                resp = await window.apiGetRoutes({ origin, destination, date });
+            } else if (window.troopApi && typeof window.troopApi.fetchRoutes === 'function') {
+                resp = await window.troopApi.fetchRoutes({ origin, destination, date });
+            } else {
+                throw new Error('API de rotas não está carregada');
+            }
+
             let routesList = [];
             if (Array.isArray(resp)) routesList = resp;
             else if (resp.routes) routesList = resp.routes;
 
+            // Filtro por destino final selecionado (por ID da rota ou texto), para grandes volumes
+            let selectedRouteId = activeSearch && typeof activeSearch.destinationRouteId === 'number'
+                ? activeSearch.destinationRouteId
+                : null;
+            const selectedDestinationLabel = activeSearch && typeof activeSearch.destination === 'string'
+                ? activeSearch.destination.trim().toLowerCase()
+                : '';
+
+            if (selectedRouteId) {
+                routesList = routesList.filter(r => Number(r.id) === Number(selectedRouteId));
+            } else if (selectedDestinationLabel) {
+                routesList = routesList.filter(r => {
+                    const dest = (r.destination || '').trim().toLowerCase();
+                    return dest === selectedDestinationLabel;
+                });
+            }
+
+            // Coordenadas da casa do usuário para cálculo de proximidade
+            let userLat = null, userLng = null;
+            if (activeSearch && typeof activeSearch.originLat === 'number' && typeof activeSearch.originLng === 'number') {
+                userLat = activeSearch.originLat;
+                userLng = activeSearch.originLng;
+            } else if (partidaCoords && typeof partidaCoords.lat === 'number' && typeof partidaCoords.lng === 'number') {
+                userLat = partidaCoords.lat;
+                userLng = partidaCoords.lng;
+            }
+
+            const userLatLng = (userLat != null && userLng != null && window.google && google.maps)
+                ? new google.maps.LatLng(userLat, userLng)
+                : null;
+
             // Mapear rotas do backend para o formato esperado pelo frontend (motoristasPorRota)
             const colors = ['#2563eb','#22c55e','#a21caf','#ff7f50','#f59e0b'];
             motoristasPorRota.length = 0;
+
             routesList.forEach((r, i) => {
                 const totalSeats = typeof r.seatCapacity === 'number' ? r.seatCapacity : null;
                 const booked = Array.isArray(r.bookings) ? r.bookings.length : 0;
                 const availableSeats = totalSeats != null ? Math.max(0, totalSeats - booked) : null;
 
-                // Preço e nota: o backend ainda não persiste preço/nota, então aqui usamos
-                // valores derivados/simulados apenas para fins de comparação visual.
-                const simulatedBasePrice = 20; // valor base simbólico
-                const price = typeof r.price === 'number' ? r.price : simulatedBasePrice + i * 5;
-                const rating = 4 + (i % 3) * 0.3; // nota simulada entre ~4.0 e ~4.6
+                const originLat = (r.originLat || r.origin?.lat);
+                const originLng = (r.originLng || r.origin?.lng);
+                let distKm = null;
+                if (userLatLng && originLat != null && originLng != null) {
+                    try {
+                        if (google.maps.geometry && google.maps.geometry.spherical && typeof google.maps.geometry.spherical.computeDistanceBetween === 'function') {
+                            const routeLatLng = new google.maps.LatLng(Number(originLat), Number(originLng));
+                            const meters = google.maps.geometry.spherical.computeDistanceBetween(userLatLng, routeLatLng);
+                            distKm = meters / 1000;
+                        } else {
+                            distKm = haversineKm({ lat: userLat, lng: userLng }, { lat: Number(originLat), lng: Number(originLng) });
+                        }
+                    } catch (e) {
+                        distKm = null;
+                    }
+                }
+
+                const trips = Array.isArray(r.trips) ? r.trips : [];
 
                 motoristasPorRota.push({
-                    rota: r.destination || r.destination,
+                    rota: r.destination || '',
                     cor: colors[i % colors.length],
                     origem: { lat: (r.originLat || r.origin?.lat) || -31.7654, lng: (r.originLng || r.origin?.lng) || -52.3371 },
                     destino: { lat: (r.destinationLat || r.destination?.lat) || -31.7800, lng: (r.destinationLng || r.destination?.lng) || -52.3400 },
+                    stops: Array.isArray(r.stops) ? r.stops : [],
+                    distKm,
+                    trips,
                     motoristas: [ {
                         nome: r.driver?.name || `Motorista ${i+1}`,
                         foto: 'https://randomuser.me/api/portraits/lego/1.jpg',
                         veiculo: r.vehicle || 'Van',
                         placa: r.id ? `R${r.id}` : '---',
-                        preco: price,
+                        preco: typeof r.price === 'number' ? r.price : null,
                         vagas: availableSeats,
-                        nota: rating
+                        nota: typeof r.rating === 'number' ? r.rating : null
                     } ]
                 });
             });
         } catch (err) {
             console.error('Erro ao buscar rotas:', err);
-            alert('Não foi possível buscar rotas do servidor. Mostrando resultados locais.');
+            alert('Não foi possível buscar rotas do servidor. Tente novamente em instantes.');
             throw err;
         }
     }
@@ -1341,6 +1290,34 @@ document.addEventListener("DOMContentLoaded", function () {
             if (loginEl) loginEl.classList.add('hidden');
             if (mobileMenu) mobileMenu.classList.add('hidden');
         } catch (err) { /* ignore */ }
+
+        // Preenche os campos da barra de busca da etapa-2 com a busca ativa
+        try {
+            const resultsOriginInput = document.getElementById('results-origin');
+            const resultsDestinoSelect = document.getElementById('results-destino');
+            const originInput = document.getElementById('partida');
+            const destinoSelect = document.getElementById('destino');
+
+            let originVal = originInput && originInput.value ? originInput.value : '';
+            let destinationVal = destinoSelect && destinoSelect.value ? destinoSelect.value : '';
+
+            try {
+                const rawActive = sessionStorage.getItem('active_search');
+                if (rawActive) {
+                    const active = JSON.parse(rawActive);
+                    if (active && typeof active.originAddress === 'string' && active.originAddress) {
+                        originVal = active.originAddress;
+                    }
+                    if (active && typeof active.destination === 'string' && active.destination) {
+                        destinationVal = active.destination;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            if (resultsOriginInput && originVal) resultsOriginInput.value = originVal;
+            if (resultsDestinoSelect && destinationVal) resultsDestinoSelect.value = destinationVal;
+        } catch (e) { /* ignore */ }
+
         renderMotoristas();
         inicializarMapaERotas();
     }
@@ -1373,6 +1350,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Botão de buscar rotas
     document.getElementById('btn-etapa-1').onclick = async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('btn-etapa-1');
         const originInput = document.getElementById('partida');
         const destinoSelect = document.getElementById('destino');
         const dateInput = document.getElementById('data');
@@ -1381,18 +1359,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const destination = destinoSelect && destinoSelect.value ? destinoSelect.value : '';
         const date = dateInput && dateInput.value ? dateInput.value : '';
 
-        const token = getAuthToken();
-
-        // Sempre abre o login sobreposto quando não estiver logado,
-        // mesmo que origem/destino estejam vazios.
-        if (!token) {
-            saveTempSearch({ origin, destination, date });
-            loginFlowContext = 'buscar';
-            showLoginModal();
-            return;
-        }
-
-        // Se já estiver logado, aí sim fazemos a validação e a busca real
+        // Validação básica de UX
         let invalid = false;
         if (originInput) originInput.classList.remove('border-red-500');
         if (destinoSelect) destinoSelect.classList.remove('border-red-500');
@@ -1412,9 +1379,63 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        saveTempSearch({ origin, destination, date });
-        await fetchAndPopulateRoutes(origin, destination);
-        goToEtapa2();
+        // Estado de carregamento no botão enquanto resolvemos geolocalização
+        const originalHtml = btn ? btn.innerHTML : null;
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('opacity-70','cursor-not-allowed');
+            btn.innerHTML = '<svg class="h-5 w-5 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M4 12a8 8 0 0 1 8-8" /></svg>Carregando...';
+        }
+
+        try {
+            // Garante lat/lng usando o Autocomplete (partidaCoords) ou geocoding manual
+            let coords = partidaCoords;
+            if ((!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') && origin) {
+                try {
+                    coords = await geocodeAddress(origin);
+                } catch (err) {
+                    coords = null;
+                }
+            }
+
+            const originLat = coords && typeof coords.lat === 'number' ? coords.lat : null;
+            const originLng = coords && typeof coords.lng === 'number' ? coords.lng : null;
+
+            const activeSearch = {
+                originAddress: origin,
+                originLat,
+                originLng,
+                destination,
+                date: date || null,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                sessionStorage.setItem('active_search', JSON.stringify(activeSearch));
+            } catch (err) { /* ignore */ }
+
+            // Mantém compatibilidade com o fluxo antigo baseado em temp_search
+            saveTempSearch({ origin, destination, date });
+
+            const token = getAuthToken();
+
+            if (!token) {
+                // Não logado: envia para login.html; após login, auth.js volta para index,
+                // onde restoreSearchFromSession usará os dados para ir à etapa 2.
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Já logado: busca rotas reais e vai direto para a segunda tela
+            await fetchAndPopulateRoutes(origin, destination);
+            goToEtapa2();
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70','cursor-not-allowed');
+                if (originalHtml !== null) btn.innerHTML = originalHtml;
+            }
+        }
     };
 
     // Submissão da barra de busca da etapa-2 (dashboard)
