@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Troop | Transporte seguro para as atividades dos seus filhos</title>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Audiowide&family=Lato:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              troop: {
+                purple: "#322275",
+                soft: "#ECE8FF",
+                accent: "#FFB8D1",
+              },
+            },
+            fontFamily: {
+              display: ["Audiowide", "system-ui", "sans-serif"],
+              body: ["Lato", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+            },
+            boxShadow: {
+              soft: "0 18px 45px rgba(12, 10, 39, 0.10)",
+            },
+            borderRadius: {
+              "3xl": "1.75rem",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      body {
+        font-family: "Lato", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <!-- Page Wrapper -->
+    <div class="min-h-screen flex flex-col">
+      <!-- Header -->
+      <header class="w-full border-b border-slate-200/70 bg-white/80 backdrop-blur z-30 sticky top-0">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div
+              class="h-10 w-10 rounded-2xl bg-troop-purple flex items-center justify-center text-white shadow-soft"
+            >
+              <span class="font-display text-xl tracking-wide">T</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-display text-xl tracking-wide text-troop-purple">Troop</span>
+              <span class="text-xs text-slate-500 leading-none">Transporte inteligente e seguro</span>
+            </div>
+          </div>
+
+          <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+            <a href="#como-funciona" class="hover:text-troop-purple transition-colors">Como funciona</a>
+            <a href="#seguranca" class="hover:text-troop-purple transition-colors">Segurança</a>
+            <a href="#depoimentos" class="hover:text-troop-purple transition-colors">Famílias Troop</a>
+            <a href="#faq" class="hover:text-troop-purple transition-colors">Dúvidas</a>
+          </nav>
+
+          <div class="flex items-center gap-3">
+            <a
+              href="login.html"
+              class="hidden sm:inline-flex text-sm font-semibold text-troop-purple hover:text-troop-purple/80"
+            >
+              Já sou cliente
+            </a>
+            <a
+              href="#cta-final"
+              class="inline-flex items-center gap-2 rounded-full bg-troop-purple px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-troop-purple/90 transition-colors"
+            >
+              Quero conhecer a Troop
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1">
+        <!-- 1. HERO SECTION -->
+        <section class="relative overflow-hidden bg-gradient-to-br from-troop-purple via-[#48339F] to-[#FFB8D1]">
+          <div class="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+          <div class="absolute -right-32 top-32 h-72 w-72 rounded-full bg-troop-soft/20 blur-3xl"></div>
+
+          <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-24">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+              <div class="text-white space-y-6">
+                <span
+                  class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.18em]"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-300"></span>
+                  Pelotas/RS • Pais e responsáveis
+                </span>
+
+                <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl leading-tight">
+                  Faltou tempo para a natação ou o inglês?
+                  <span class="block mt-1">A Troop leva seu filho com toda a segurança.</span>
+                </h1>
+
+                <p class="text-base sm:text-lg text-slate-100/90 max-w-xl">
+                  Chega de malabarismo entre trabalho, trânsito e rotina das crianças. A Troop cuida do caminho até as
+                  atividades extracurriculares com motoristas selecionados, rota inteligente e acompanhamento em tempo
+                  real pelo seu celular.
+                </p>
+
+                <!-- Formulário Hero -->
+                <div
+                  class="mt-6 rounded-3xl bg-white/10 p-4 sm:p-5 backdrop-blur shadow-soft border border-white/10"
+                >
+                  <p class="text-xs sm:text-sm text-slate-100 mb-3 sm:mb-4 font-medium">
+                    Em menos de 1 minuto, veja se já existe uma rota Troop ideal para a rotina do seu filho em Pelotas.
+                  </p>
+
+                  <form
+                    id="hero-search-form"
+                    class="flex flex-col md:flex-row gap-3 md:items-end"
+                  >
+                    <div class="flex-1">
+                      <label for="school" class="block text-xs font-semibold text-slate-100 mb-1">Onde ele estuda?</label>
+                      <input
+                        id="school"
+                        name="school"
+                        type="text"
+                        required
+                        placeholder="Ex.: Colégio São José, Federal, Gonzaga..."
+                        class="w-full rounded-2xl bg-white/95 text-slate-900 px-3 py-2.5 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-troop-purple/80 focus:ring-offset-transparent"
+                      />
+                    </div>
+
+                    <div class="md:w-56">
+                      <label for="activity" class="block text-xs font-semibold text-slate-100 mb-1">
+                        Para qual atividade ele vai?
+                      </label>
+                      <select
+                        id="activity"
+                        name="activity"
+                        required
+                        class="w-full rounded-2xl bg-white/95 text-slate-900 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-troop-purple/80 focus:ring-offset-transparent"
+                      >
+                        <option value="" disabled selected>Selecione</option>
+                        <option>Inglês</option>
+                        <option>Futebol</option>
+                        <option>Judô</option>
+                        <option>Balé</option>
+                        <option>Reforço escolar</option>
+                        <option>Música</option>
+                        <option>Natação</option>
+                        <option>Outra atividade</option>
+                      </select>
+                    </div>
+
+                    <div class="md:w-auto">
+                      <button
+                        type="submit"
+                        class="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-soft hover:bg-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-300/80"
+                      >
+                        Buscar rotas disponíveis
+                        <i class="fa-solid fa-location-arrow text-xs"></i>
+                      </button>
+                    </div>
+                  </form>
+
+                  <p id="hero-form-error" class="hidden mt-2 text-xs text-rose-100 font-medium">
+                    Por favor, preencha a escola e a atividade para continuarmos.
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-4 mt-4 text-xs text-slate-100/90">
+                  <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-heart text-emerald-300"></i>
+                    <span>Selo Troop: motoristas checados e treinados</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-route text-amber-200"></i>
+                    <span>Rotas otimizadas para trajetos mais curtos</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-earth-americas text-sky-200"></i>
+                    <span>Ajuda a tirar até 15 carros da rua</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="relative">
+                <div
+                  class="relative rounded-3xl bg-white/95 shadow-soft p-4 sm:p-6 lg:p-7 mt-4 sm:mt-0 max-w-md ml-auto"
+                >
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <p class="text-xs font-semibold text-troop-purple/90">Viagem em andamento</p>
+                      <p class="text-sm text-slate-500">Lucas • 10 anos • Natação</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Em rota segura
+                    </span>
+                  </div>
+
+                  <div class="space-y-3 text-xs text-slate-600">
+                    <div class="flex items-center justify-between">
+                      <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-van-shuttle text-troop-purple"></i>
+                        <span>Motorista parceiro: Ana Paula</span>
+                      </span>
+                      <span class="text-[11px] text-slate-400">Rota Pelotas Centro → Laranjal</span>
+                    </div>
+
+                    <div class="relative h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                      <div class="absolute inset-y-0 left-0 w-3/5 bg-gradient-to-r from-troop-purple via-indigo-400 to-emerald-300"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] text-slate-500">
+                      <span>Embarque confirmado • 16:05</span>
+                      <span>Previsão de chegada • 16:22</span>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-3 gap-2 text-[11px]">
+                      <div class="rounded-2xl bg-slate-50 p-2 flex flex-col gap-1">
+                        <span class="text-slate-400">Embarque</span>
+                        <span class="font-semibold text-slate-700">Notificação enviada</span>
+                      </div>
+                      <div class="rounded-2xl bg-slate-50 p-2 flex flex-col gap-1">
+                        <span class="text-slate-400">Motorista</span>
+                        <span class="font-semibold text-slate-700">Perfil verificado</span>
+                      </div>
+                      <div class="rounded-2xl bg-slate-50 p-2 flex flex-col gap-1">
+                        <span class="text-slate-400">Rota</span>
+                        <span class="font-semibold text-slate-700">Trajeto otimizado</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-3">
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                      <i class="fa-solid fa-mobile-screen-button text-troop-purple"></i>
+                      <span>Acompanhe cada passo pelo app.</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-troop-purple hover:bg-slate-50"
+                    >
+                      Ver exemplo de rota
+                      <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. EMPATIA (O PROBLEMA) -->
+        <section class="bg-white">
+          <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div class="grid md:grid-cols-[1.2fr,1fr] gap-10 items-center">
+              <div>
+                <h2 class="font-display text-2xl sm:text-3xl text-troop-purple mb-4">
+                  Você sente que precisa se dividir em dois para dar conta de tudo?
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base mb-4">
+                  Trabalho em horário comercial, trânsito pesado, reuniões de última hora, tarefas de casa... e, no meio
+                  de tudo isso, o horário do inglês, da natação ou do futebol do seu filho. Parece que o dia precisaria
+                  ter mais horas para dar conta de tudo com calma.
+                </p>
+                <p class="text-slate-600 text-sm sm:text-base mb-4">
+                  Muitos pais em Pelotas acabam recorrendo a favores de familiares, motoristas informais ou correndo da
+                  empresa direto para a escola — sempre com aquela sensação de culpa e preocupação: “Será que ele chegou
+                  bem? Quem está dirigindo? E se acontecer alguma coisa no caminho?”.
+                </p>
+                <p class="text-slate-600 text-sm sm:text-base font-medium">
+                  A Troop nasceu justamente para tirar esse peso dos seus ombros: seu filho chega em segurança às
+                  atividades, e você volta a ter paz para focar no que precisa.
+                </p>
+              </div>
+
+              <div class="md:pl-6">
+                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6 shadow-soft/40">
+                  <div class="flex items-start gap-3 mb-3">
+                    <span class="mt-0.5 text-lg">💬</span>
+                    <p class="text-sm text-slate-700">
+                      "Eu vivia fazendo contas de horário para sair do trabalho, pegar o trânsito e ainda chegar a tempo
+                      de levar o Lucas pro futebol. Qualquer imprevisto virava um caos. Hoje, com a Troop, eu acompanho
+                      tudo pelo celular e sei exatamente a hora que ele embarca e chega. Foi um alívio gigante pra nossa
+                      rotina."
+                    </p>
+                  </div>
+                  <p class="text-xs font-semibold text-slate-500">Mariana, mãe do Lucas (10 anos)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. PRATICIDADE (COMO FUNCIONA) -->
+        <section id="como-funciona" class="bg-troop-soft/60">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div class="max-w-3xl mb-10">
+              <h2 class="font-display text-2xl sm:text-3xl text-troop-purple mb-3">Praticidade em três passos</h2>
+              <p class="text-slate-600 text-sm sm:text-base">
+                A Troop combina tecnologia e cuidado humano para que seu filho vá e volte das atividades com conforto e
+                segurança — enquanto você acompanha tudo pelo celular, sem precisar sair correndo do trabalho.
+              </p>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-3">
+              <!-- Card 1 -->
+              <div class="rounded-3xl bg-white shadow-soft p-5 sm:p-6 flex flex-col gap-3 border border-slate-100">
+                <div
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-troop-purple/10 text-troop-purple"
+                >
+                  <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <h3 class="font-semibold text-slate-900 text-base">1. Busque a rota ideal</h3>
+                <p class="text-sm text-slate-600">
+                  Você cadastra a rotina do seu filho (escola, endereço, dias e horários das atividades) e a Troop cruza
+                  com nossa rede de motoristas parceiros em Pelotas para encontrar as melhores rotas disponíveis.
+                </p>
+              </div>
+
+              <!-- Card 2 -->
+              <div class="rounded-3xl bg-white shadow-soft p-5 sm:p-6 flex flex-col gap-3 border border-slate-100">
+                <div
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-troop-purple/10 text-troop-purple"
+                >
+                  <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <h3 class="font-semibold text-slate-900 text-base">2. Agende e personalize</h3>
+                <p class="text-sm text-slate-600">
+                  Você escolhe o plano mais adequado (viagens avulsas ou mensais), define pontos de embarque e
+                  desembarque e adiciona observações importantes, como quem pode receber a criança em casa ou no clube.
+                </p>
+              </div>
+
+              <!-- Card 3 -->
+              <div class="rounded-3xl bg-white shadow-soft p-5 sm:p-6 flex flex-col gap-3 border border-slate-100">
+                <div
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-troop-purple/10 text-troop-purple"
+                >
+                  <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <h3 class="font-semibold text-slate-900 text-base">3. Acompanhe em tempo real</h3>
+                <p class="text-sm text-slate-600">
+                  No aplicativo, você acompanha a van em tempo real no mapa, recebe notificações a cada embarque e
+                  desembarque e pode conversar com o suporte sempre que precisar. Seu filho seguro, sua cabeça tranquila.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. SEGURANÇA (DIFERENCIAIS) -->
+        <section id="seguranca" class="bg-white">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div class="grid lg:grid-cols-[1.1fr,1fr] gap-10 items-start">
+              <div>
+                <h2 class="font-display text-2xl sm:text-3xl text-troop-purple mb-3">Tecnologia + Segurança Absoluta</h2>
+                <p class="text-slate-600 text-sm sm:text-base mb-5">
+                  Mais do que um transporte escolar, a Troop é uma plataforma pensada para pais que não abrem mão da
+                  segurança, mas também não podem parar a vida profissional. Cada detalhe foi desenhado para oferecer
+                  confiança do primeiro ao último minuto da viagem.
+                </p>
+
+                <div class="space-y-4">
+                  <div class="flex gap-3">
+                    <div
+                      class="mt-1 h-8 w-8 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"
+                    >
+                      <i class="fa-solid fa-shield-heart"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900">Selo Troop de confiança</h3>
+                      <p class="text-sm text-slate-600">
+                        Cada motorista passa por checagem rigorosa de antecedentes, análise de documentação, entrevista
+                        humanizada e treinamento contínuo em segurança e cuidado com crianças e adolescentes.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <div
+                      class="mt-1 h-8 w-8 flex items-center justify-center rounded-2xl bg-indigo-50 text-troop-purple"
+                    >
+                      <i class="fa-solid fa-van-shuttle"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900">Veículos vistoriados e rotas otimizadas</h3>
+                      <p class="text-sm text-slate-600">
+                        Os veículos são vistoriados periodicamente e, por trás da experiência simples do app, um
+                        algoritmo inteligente monta rotas mais curtas, reduzindo o tempo de deslocamento e a exposição
+                        da criança no trânsito.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <div
+                      class="mt-1 h-8 w-8 flex items-center justify-center rounded-2xl bg-sky-50 text-sky-600"
+                    >
+                      <i class="fa-solid fa-location-crosshairs"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900">GPS em tempo real e notificações</h3>
+                      <p class="text-sm text-slate-600">
+                        Você vê a van no mapa durante todo o trajeto e recebe notificações no exato momento do embarque
+                        e desembarque. Nada de adivinhar se seu filho já chegou: a informação vem até você.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <div
+                      class="mt-1 h-8 w-8 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700"
+                    >
+                      <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900">Impacto ESG: menos carros nas ruas</h3>
+                      <p class="text-sm text-slate-600">
+                        Ao optar por uma rota compartilhada com a Troop, você ajuda a tirar até 15 carros das ruas nos
+                        horários de pico. Menos poluição, menos congestionamento e uma cidade mais segura para todas as
+                        famílias.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="lg:pl-6">
+                <div class="rounded-3xl bg-troop-purple text-white p-6 sm:p-7 shadow-soft">
+                  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200 mb-3">
+                    Selo Troop
+                  </p>
+                  <p class="text-sm sm:text-base mb-4">
+                    "Nós tratamos cada trajeto como se fosse com o nosso próprio filho."
+                  </p>
+                  <ul class="space-y-2 text-xs sm:text-sm text-slate-100/95 mb-5">
+                    <li class="flex gap-2">
+                      <span class="mt-0.5 text-emerald-300"><i class="fa-solid fa-check"></i></span>
+                      <span>Checagem de antecedentes criminais e validação documental completa.</span>
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="mt-0.5 text-emerald-300"><i class="fa-solid fa-check"></i></span>
+                      <span>Treinamento em direção responsável, condução de crianças e atendimento a famílias.</span>
+                    </li>
+                    <li class="flex gap-2">
+                      <span class="mt-0.5 text-emerald-300"><i class="fa-solid fa-check"></i></span>
+                      <span>Monitoramento constante de rotas e suporte humano durante as viagens.</span>
+                    </li>
+                  </ul>
+                  <p class="text-xs text-emerald-100/90">
+                    Segurança não é um diferencial: é a base de tudo que fazemos.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. PROVA SOCIAL (DEPOIMENTOS) -->
+        <section id="depoimentos" class="bg-troop-soft/60">
+          <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div class="max-w-3xl mb-8 sm:mb-10">
+              <h2 class="font-display text-2xl sm:text-3xl text-troop-purple mb-3">Famílias que já confiam na Troop</h2>
+              <p class="text-slate-600 text-sm sm:text-base">
+                A tecnologia é importante, mas nada fala mais alto do que ouvir outros pais que sentiam a mesma pressão
+                que você e hoje vivem a rotina com mais leveza.
+              </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Depoimento Mariana -->
+              <article class="rounded-3xl bg-white shadow-soft p-5 sm:p-6 border border-slate-100 flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="h-10 w-10 rounded-full bg-troop-purple/10 flex items-center justify-center text-troop-purple">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">Mariana</p>
+                    <p class="text-xs text-slate-500">Mãe do Lucas, 10 anos • Futebol e inglês</p>
+                  </div>
+                </div>
+                <p class="text-sm text-slate-700 mt-1">
+                  "Antes da Troop, toda terça e quinta eram um desespero. Eu saía do trabalho olhando o relógio, torcendo
+                  para não pegar trânsito, e vivia com a sensação de estar falhando em algum lado. Com a Troop, o Lucas
+                  continua indo para as atividades que ama e eu acompanho tudo pelo app. Hoje sinto que nossa rotina
+                  finalmente respirou."
+                </p>
+              </article>
+
+              <!-- Depoimento Rafael -->
+              <article class="rounded-3xl bg-white shadow-soft p-5 sm:p-6 border border-slate-100 flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="h-10 w-10 rounded-full bg-troop-purple/10 flex items-center justify-center text-troop-purple">
+                    <i class="fa-solid fa-user-tie"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">Rafael</p>
+                    <p class="text-xs text-slate-500">Pai da Sofia, 12 anos • Judô e reforço</p>
+                  </div>
+                </div>
+                <p class="text-sm text-slate-700 mt-1">
+                  "Eu tinha muito receio de transporte escolar ‘de indicação’, sem saber de verdade quem estava dirigindo.
+                  Quando conheci o Selo Troop e vi o nível de checagem e acompanhamento em tempo real, fiquei muito mais
+                  tranquilo. A Sofia se sente segura com os motoristas e eu recebo as notificações certinhas de embarque e
+                  chegada. Foi a melhor decisão para a nossa rotina."
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. FAQ (DÚVIDAS FREQUENTES) -->
+        <section id="faq" class="bg-white">
+          <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div class="mb-8 sm:mb-10 text-center">
+              <h2 class="font-display text-2xl sm:text-3xl text-troop-purple mb-3">Dúvidas frequentes</h2>
+              <p class="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto">
+                Transparência é parte da segurança. Separamos as principais perguntas de pais e responsáveis que estão
+                conhecendo a Troop agora.
+              </p>
+            </div>
+
+            <div class="space-y-3" role="list">
+              <!-- FAQ item -->
+              <div class="rounded-3xl border border-slate-200 bg-slate-50/80 overflow-hidden" role="listitem">
+                <button
+                  type="button"
+                  class="faq-toggle w-full flex items-center justify-between px-4 sm:px-5 py-4 text-left"
+                  aria-expanded="false"
+                >
+                  <span class="text-sm sm:text-base font-semibold text-slate-900">
+                    Quem são os motoristas parceiros da Troop?
+                  </span>
+                  <span class="ml-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-slate-500">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                  </span>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-out">
+                  <div class="px-4 sm:px-5 pb-4 text-sm text-slate-700">
+                    Todos os motoristas passam pelo processo do Selo Troop: análise de antecedentes criminais,
+                    verificação de documentação, avaliação de experiência com transporte de crianças e adolescentes e
+                    treinamento contínuo em segurança e atendimento. Só depois disso eles ficam disponíveis na
+                    plataforma.
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-3xl border border-slate-200 bg-slate-50/80 overflow-hidden" role="listitem">
+                <button
+                  type="button"
+                  class="faq-toggle w-full flex items-center justify-between px-4 sm:px-5 py-4 text-left"
+                  aria-expanded="false"
+                >
+                  <span class="text-sm sm:text-base font-semibold text-slate-900">
+                    Como funciona o pagamento digital?
+                  </span>
+                  <span class="ml-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-slate-500">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                  </span>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-out">
+                  <div class="px-4 sm:px-5 pb-4 text-sm text-slate-700">
+                    Todo o pagamento é feito diretamente pelo app, com opções de planos mensais ou viagens avulsas, de
+                    acordo com a rotina da sua família. Você recebe o resumo das viagens e valores de forma organizada,
+                    sem precisar lidar com dinheiro em espécie na porta da escola.
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-3xl border border-slate-200 bg-slate-50/80 overflow-hidden" role="listitem">
+                <button
+                  type="button"
+                  class="faq-toggle w-full flex items-center justify-between px-4 sm:px-5 py-4 text-left"
+                  aria-expanded="false"
+                >
+                  <span class="text-sm sm:text-base font-semibold text-slate-900">
+                    A viagem tem seguro? O que acontece se houver algum imprevisto?
+                  </span>
+                  <span class="ml-3 flex h-7 w-7 items-center justify-center rounded-full bg-white text-slate-500">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                  </span>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-out">
+                  <div class="px-4 sm:px-5 pb-4 text-sm text-slate-700">
+                    As viagens contam com cobertura de seguro conforme as exigências legais para transporte de
+                    passageiros e acompanhamento ativo da equipe Troop. Em caso de qualquer imprevisto, você é avisado
+                    imediatamente pelo app e pelo canal de atendimento, com prioridade total para a segurança da
+                    criança.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. CTA FINAL -->
+        <section id="cta-final" class="bg-gradient-to-br from-troop-purple via-[#48339F] to-[#FFB8D1]">
+          <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+            <div class="rounded-3xl bg-white/10 border border-white/15 shadow-soft p-6 sm:p-8 text-white text-center">
+              <h2 class="font-display text-2xl sm:text-3xl mb-3">
+                Tire o peso da logística dos seus ombros.
+              </h2>
+              <p class="text-sm sm:text-base text-slate-100 max-w-2xl mx-auto mb-6">
+                Deixe que a Troop cuide do caminho entre a escola e as atividades extracurriculares do seu filho, com
+                segurança máxima e acompanhamento em tempo real. Você ganha tempo, tranquilidade e presença de verdade
+                nos momentos que importam.
+              </p>
+
+              <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href="#hero-search"
+                  onclick="event.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' });"
+                  class="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-soft hover:bg-emerald-300"
+                >
+                  Começar buscando uma rota
+                  <i class="fa-solid fa-location-dot text-xs"></i>
+                </a>
+                <a
+                  href="login.html"
+                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/60 px-5 py-2.5 text-sm font-semibold text-white/95 hover:bg-white/10"
+                >
+                  Já tenho cadastro
+                  <i class="fa-solid fa-arrow-right-long text-xs"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 8. RODAPÉ PROFISSIONAL -->
+      <footer class="bg-slate-950 text-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div class="space-y-2 max-w-md">
+              <div class="flex items-center gap-2">
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-troop-purple text-white shadow-soft"
+                >
+                  <span class="font-display text-lg tracking-wide">T</span>
+                </span>
+                <span class="font-display text-lg tracking-wide">Troop</span>
+              </div>
+              <p class="text-xs text-slate-400">
+                Plataforma de transporte inteligente e seguro para crianças e adolescentes em atividades
+                extracurriculares. Focada em famílias de Pelotas/RS neste primeiro momento.
+              </p>
+              <p class="text-xs font-medium text-emerald-300 flex items-center gap-1">
+                <i class="fa-solid fa-award text-[11px]"></i>
+                Aprovado pelo Programa Centelha - Pelotas/RS
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-6 text-xs">
+              <div class="space-y-2">
+                <p class="font-semibold text-slate-200">Institucional</p>
+                <a href="#" class="block text-slate-400 hover:text-slate-200">Termos de uso</a>
+                <a href="#" class="block text-slate-400 hover:text-slate-200">Política de privacidade</a>
+              </div>
+              <div class="space-y-2">
+                <p class="font-semibold text-slate-200">Contato</p>
+                <a href="mailto:contato@troop.app" class="block text-slate-400 hover:text-slate-200">
+                  contato@troop.app
+                </a>
+                <a href="#" class="block text-slate-400 hover:text-slate-200 flex items-center gap-1">
+                  <i class="fa-brands fa-whatsapp text-[13px]"></i>
+                  <span>Falar com atendimento</span>
+                </a>
+              </div>
+              <div class="space-y-2">
+                <p class="font-semibold text-slate-200">Redes sociais</p>
+                <a href="#" class="block text-slate-400 hover:text-slate-200 flex items-center gap-1">
+                  <i class="fa-brands fa-instagram text-[13px]"></i>
+                  <span>@troop.app</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p class="text-[11px] text-slate-500">
+              © <span id="year"></span> Troop. Todos os direitos reservados.
+            </p>
+            <p class="text-[11px] text-slate-600">
+              Desenvolvido para pais que valorizam segurança, autonomia e tempo em família.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+      // Atualiza ano no rodapé
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Formulário hero: salva no sessionStorage e redireciona
+      const heroForm = document.getElementById("hero-search-form");
+      const heroError = document.getElementById("hero-form-error");
+
+      if (heroForm) {
+        heroForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const schoolInput = document.getElementById("school");
+          const activitySelect = document.getElementById("activity");
+
+          const school = schoolInput.value.trim();
+          const activity = activitySelect.value.trim();
+
+          if (!school || !activity) {
+            heroError.classList.remove("hidden");
+            return;
+          }
+
+          heroError.classList.add("hidden");
+
+          const activeSearch = {
+            school,
+            activity,
+            createdAt: new Date().toISOString(),
+          };
+
+          try {
+            sessionStorage.setItem("active_search", JSON.stringify(activeSearch));
+          } catch (error) {
+            console.error("Erro ao salvar busca ativa na sessionStorage", error);
+          }
+
+          window.location.href = "login.html";
+        });
+      }
+
+      // FAQ accordion
+      const faqToggles = document.querySelectorAll(".faq-toggle");
+
+      faqToggles.forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          const item = toggle.parentElement;
+          const content = item.querySelector(".faq-content");
+          const icon = toggle.querySelector("i");
+          const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+
+          if (isExpanded) {
+            content.style.maxHeight = null;
+            toggle.setAttribute("aria-expanded", "false");
+            if (icon) {
+              icon.classList.remove("fa-minus");
+              icon.classList.add("fa-plus");
+            }
+          } else {
+            // fecha outros
+            faqToggles.forEach((other) => {
+              if (other !== toggle) {
+                const otherContent = other.parentElement.querySelector(".faq-content");
+                const otherIcon = other.querySelector("i");
+                other.setAttribute("aria-expanded", "false");
+                if (otherContent) otherContent.style.maxHeight = null;
+                if (otherIcon) {
+                  otherIcon.classList.remove("fa-minus");
+                  otherIcon.classList.add("fa-plus");
+                }
+              }
+            });
+
+            content.style.maxHeight = content.scrollHeight + "px";
+            toggle.setAttribute("aria-expanded", "true");
+            if (icon) {
+              icon.classList.remove("fa-plus");
+              icon.classList.add("fa-minus");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
