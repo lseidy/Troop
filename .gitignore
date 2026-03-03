@@ -1,0 +1,23 @@
+# Node monorepo root
+node_modules/
+
+# Env files (never commit secrets)
+.env
+.env.*
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Build / coverage (if added later)
+coverage/
+dist/

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - Troop</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Audiowide&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'troop-purple': '#322275',
+              'troop-light-gray': '#F5F5F5',
+              'troop-dark-gray': '#333333',
+              'troop-white': '#FFFFFF',
+              muted: '#E5E7EB',
+              'muted-foreground': '#6B7280',
+            },
+            fontFamily: {
+              lato: ['Lato', 'sans-serif'],
+              horizon: ['Audiowide', 'cursive'],
+            },
+            boxShadow: {
+              strong:
+                '0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen font-lato bg-troop-light-gray text-troop-dark-gray">
+    <!-- Header -->
+    <header class="h-14 px-4 sm:px-6 flex items-center justify-between bg-troop-purple text-troop-white shadow">
+      <div class="flex items-center gap-2">
+        <div
+          class="relative flex items-center justify-center h-10 w-10 bg-troop-white/90 rounded-2xl shadow-2xl"
+        >
+          <img
+            src="https://img.icons8.com/?size=100&id=QTQ1x0Wu6rnn&format=png&color=000000"
+            alt="Van Escolar"
+            class="h-7 w-7 object-contain drop-shadow-xl"
+          />
+        </div>
+        <span class="font-horizon text-xl tracking-wide">Troop</span>
+      </div>
+      <p class="text-xs sm:text-sm text-troop-white/80 hidden sm:block">
+        Passos finais para garantir a rota do seu filho.
+      </p>
+    </header>
+
+    <!-- Conteúdo -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <!-- Stepper visual -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-semibold text-muted-foreground mb-2">
+          <span id="label-step-1" class="text-troop-purple">1. Revisão</span>
+          <span id="label-step-2">2. Plano</span>
+          <span id="label-step-3">3. Pagamento</span>
+        </div>
+        <div class="h-2 rounded-full bg-muted overflow-hidden">
+          <div id="progress-bar" class="h-2 bg-troop-purple rounded-full w-1/3 transition-all"></div>
+        </div>
+      </div>
+
+      <!-- Card principal -->
+      <section class="bg-troop-white rounded-3xl shadow-strong p-5 sm:p-7 space-y-6">
+        <!-- PASSO 1: Revisão -->
+        <div id="step-1" class="space-y-4">
+          <h1 class="text-xl sm:text-2xl font-horizon text-troop-dark-gray">
+            Revise os detalhes da rota
+          </h1>
+          <p class="text-sm text-muted-foreground">
+            Confira se as informações abaixo estão corretas antes de avançar para a escolha do plano.
+          </p>
+
+          <div class="grid sm:grid-cols-2 gap-4 text-sm">
+            <div class="bg-troop-light-gray rounded-2xl p-3">
+              <p class="text-xs font-semibold text-muted-foreground mb-1">Origem</p>
+              <p id="summary-origin" class="font-semibold text-troop-dark-gray">—</p>
+            </div>
+            <div class="bg-troop-light-gray rounded-2xl p-3">
+              <p class="text-xs font-semibold text-muted-foreground mb-1">Destino / Atividade</p>
+              <p id="summary-destination" class="font-semibold text-troop-dark-gray">—</p>
+            </div>
+            <div class="bg-troop-light-gray rounded-2xl p-3">
+              <p class="text-xs font-semibold text-muted-foreground mb-1">Motorista selecionado</p>
+              <p id="summary-driver" class="font-semibold text-troop-dark-gray">—</p>
+            </div>
+            <div class="bg-troop-light-gray rounded-2xl p-3">
+              <p class="text-xs font-semibold text-muted-foreground mb-1">Valor estimado</p>
+              <p id="summary-price" class="font-semibold text-troop-purple">—</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between gap-3 pt-2 text-xs sm:text-sm">
+            <button
+              type="button"
+              id="btn-back-search"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-muted text-muted-foreground hover:bg-muted/60"
+            >
+              Voltar para ajuste da busca
+            </button>
+            <button
+              type="button"
+              id="to-step-2"
+              class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-troop-purple text-troop-white font-semibold hover:bg-troop-purple/90"
+            >
+              Continuar para escolha do plano
+            </button>
+          </div>
+        </div>
+
+        <!-- PASSO 2: Planos -->
+        <div id="step-2" class="space-y-4 hidden">
+          <h2 class="text-xl sm:text-2xl font-horizon text-troop-dark-gray">
+            Escolha o plano ideal
+          </h2>
+          <p class="text-sm text-muted-foreground">
+            Você pode começar com um plano semanal para testar a rotina ou garantir logo o mês inteiro com desconto.
+          </p>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              id="plan-weekly"
+              class="text-left rounded-2xl border-2 border-muted bg-troop-light-gray px-4 py-4 hover:border-troop-purple hover:bg-troop-light-gray/80"
+            >
+              <p class="text-xs font-semibold text-muted-foreground mb-1">Plano Semanal</p>
+              <p class="text-lg font-bold text-troop-dark-gray mb-1">R$ 120 / semana</p>
+              <p class="text-xs text-muted-foreground">
+                Ideal para testar a rotina ou cobrir semanas específicas de atividades.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              id="plan-monthly"
+              class="text-left rounded-2xl border-2 border-troop-purple bg-troop-purple text-troop-white px-4 py-4 hover:bg-troop-purple/95"
+            >
+              <p class="text-xs font-semibold text-troop-white/80 mb-1">Plano Mensal</p>
+              <p class="text-lg font-bold mb-1">R$ 380 / mês</p>
+              <p class="text-xs text-troop-white/90">
+                Melhor custo-benefício para quem já sabe que vai usar toda semana.
+              </p>
+            </button>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between gap-3 pt-2 text-xs sm:text-sm">
+            <button
+              type="button"
+              id="back-to-1"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-muted text-muted-foreground hover:bg-muted/60"
+            >
+              Voltar para revisão
+            </button>
+            <button
+              type="button"
+              id="to-step-3"
+              class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-troop-purple text-troop-white font-semibold hover:bg-troop-purple/90"
+            >
+              Avançar para pagamento
+            </button>
+          </div>
+        </div>
+
+        <!-- PASSO 3: Pagamento -->
+        <div id="step-3" class="space-y-4 hidden">
+          <h2 class="text-xl sm:text-2xl font-horizon text-troop-dark-gray">
+            Escolha a forma de pagamento
+          </h2>
+          <p class="text-sm text-muted-foreground">
+            Para o MVP, vamos simular o fluxo de pagamento. Nenhuma cobrança real será feita.
+          </p>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              id="pay-pix"
+              class="text-left rounded-2xl border-2 border-troop-purple bg-troop-purple text-troop-white px-4 py-4 hover:bg-troop-purple/95"
+            >
+              <p class="text-xs font-semibold text-troop-white/80 mb-1">Pix</p>
+              <p class="text-lg font-bold mb-1">Pagamento instantâneo</p>
+              <p class="text-xs text-troop-white/90">
+                Mostraremos um QR Code simulado para representar a confirmação.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              id="pay-card"
+              class="text-left rounded-2xl border-2 border-muted bg-troop-light-gray px-4 py-4 hover:border-troop-purple hover:bg-troop-light-gray/80"
+            >
+              <p class="text-xs font-semibold text-muted-foreground mb-1">Cartão de crédito</p>
+              <p class="text-lg font-bold text-troop-dark-gray mb-1">Em até 3x sem juros</p>
+              <p class="text-xs text-muted-foreground">
+                Formulário simplificado para captura dos dados do cartão.
+              </p>
+            </button>
+          </div>
+
+          <!-- Forma de pagamento dinâmica -->
+          <div id="payment-form" class="mt-4 space-y-3 text-sm"></div>
+
+          <div class="flex flex-col sm:flex-row justify-between gap-3 pt-2 text-xs sm:text-sm">
+            <button
+              type="button"
+              id="back-to-2"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-muted text-muted-foreground hover:bg-muted/60"
+            >
+              Voltar para planos
+            </button>
+            <button
+              type="button"
+              id="btn-confirm"
+              class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-troop-purple text-troop-white font-semibold hover:bg-troop-purple/90"
+            >
+              Confirmar contratação
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module">
+      import { checkAuth } from './js/router.js';
+
+      checkAuth();
+
+      const step1 = document.getElementById('step-1');
+      const step2 = document.getElementById('step-2');
+      const step3 = document.getElementById('step-3');
+      const progressBar = document.getElementById('progress-bar');
+      const label1 = document.getElementById('label-step-1');
+      const label2 = document.getElementById('label-step-2');
+      const label3 = document.getElementById('label-step-3');
+
+      const summaryOrigin = document.getElementById('summary-origin');
+      const summaryDestination = document.getElementById('summary-destination');
+      const summaryDriver = document.getElementById('summary-driver');
+      const summaryPrice = document.getElementById('summary-price');
+
+      const backSearchBtn = document.getElementById('btn-back-search');
+      const toStep2Btn = document.getElementById('to-step-2');
+      const backTo1Btn = document.getElementById('back-to-1');
+      const toStep3Btn = document.getElementById('to-step-3');
+      const backTo2Btn = document.getElementById('back-to-2');
+      const confirmBtn = document.getElementById('btn-confirm');
+
+      const planWeeklyBtn = document.getElementById('plan-weekly');
+      const planMonthlyBtn = document.getElementById('plan-monthly');
+      const paymentForm = document.getElementById('payment-form');
+      const payPixBtn = document.getElementById('pay-pix');
+      const payCardBtn = document.getElementById('pay-card');
+
+      let currentStep = 1;
+      let selectedPlan = 'MONTHLY';
+      let selectedPaymentMethod = 'PIX';
+
+      function setStep(step) {
+        currentStep = step;
+
+        step1.classList.toggle('hidden', step !== 1);
+        step2.classList.toggle('hidden', step !== 2);
+        step3.classList.toggle('hidden', step !== 3);
+
+        if (step === 1) {
+          progressBar.style.width = '33%';
+          label1.classList.add('text-troop-purple');
+          label2.classList.remove('text-troop-purple');
+          label3.classList.remove('text-troop-purple');
+        } else if (step === 2) {
+          progressBar.style.width = '66%';
+          label1.classList.add('text-troop-purple');
+          label2.classList.add('text-troop-purple');
+          label3.classList.remove('text-troop-purple');
+        } else {
+          progressBar.style.width = '100%';
+          label1.classList.add('text-troop-purple');
+          label2.classList.add('text-troop-purple');
+          label3.classList.add('text-troop-purple');
+        }
+      }
+
+      function renderPaymentForm() {
+        if (!paymentForm) return;
+
+        if (selectedPaymentMethod === 'PIX') {
+          paymentForm.innerHTML = `
+            <div class="bg-troop-light-gray rounded-2xl p-4 text-sm">
+              <p class="font-semibold mb-2">Pix (simulado)</p>
+              <p class="text-xs text-muted-foreground mb-3">
+                No produto final, aqui aparecerá um QR Code real. Por enquanto, usamos esse passo apenas para representar o fluxo.
+              </p>
+              <div class="flex items-center justify-center h-32 bg-troop-white rounded-xl border border-muted">
+                <span class="text-[11px] text-muted-foreground">QR Code Pix será exibido aqui</span>
+              </div>
+            </div>
+          `;
+        } else {
+          paymentForm.innerHTML = `
+            <div class="bg-troop-light-gray rounded-2xl p-4 text-sm space-y-3">
+              <p class="font-semibold mb-1">Cartão de crédito (simulado)</p>
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-muted-foreground mb-1">Número do cartão</label>
+                  <input type="text" class="w-full rounded-lg border border-muted px-3 py-2 text-sm" placeholder="0000 0000 0000 0000" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-muted-foreground mb-1">Nome impresso</label>
+                  <input type="text" class="w-full rounded-lg border border-muted px-3 py-2 text-sm" placeholder="Nome completo" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-muted-foreground mb-1">Validade</label>
+                  <input type="text" class="w-full rounded-lg border border-muted px-3 py-2 text-sm" placeholder="MM/AA" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-muted-foreground mb-1">CVV</label>
+                  <input type="text" class="w-full rounded-lg border border-muted px-3 py-2 text-sm" placeholder="123" />
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function hydrateFromSession() {
+        let activeSearch = null;
+        let selectedVan = null;
+
+        try {
+          const rawSearch = sessionStorage.getItem('active_search');
+          if (rawSearch) activeSearch = JSON.parse(rawSearch);
+        } catch (e) {
+          console.warn('Erro ao ler active_search:', e);
+        }
+
+        try {
+          const rawVan = sessionStorage.getItem('selected_van');
+          if (rawVan) selectedVan = JSON.parse(rawVan);
+        } catch (e) {
+          console.warn('Erro ao ler selected_van:', e);
+        }
+
+        const originText = activeSearch?.origin || activeSearch?.school || 'Origem não informada';
+        const destinationText =
+          activeSearch?.destination || activeSearch?.activity || 'Destino/atividade não informada';
+
+        if (summaryOrigin) summaryOrigin.textContent = originText;
+        if (summaryDestination) summaryDestination.textContent = destinationText;
+        if (summaryDriver) summaryDriver.textContent = selectedVan?.driver_name || 'Motorista parceiro Troop';
+        if (summaryPrice) summaryPrice.textContent = selectedVan?.price || 'A combinar';
+      }
+
+      // Navegação entre passos
+      if (toStep2Btn) toStep2Btn.addEventListener('click', () => setStep(2));
+      if (backTo1Btn) backTo1Btn.addEventListener('click', () => setStep(1));
+      if (toStep3Btn) toStep3Btn.addEventListener('click', () => setStep(3));
+      if (backTo2Btn) backTo2Btn.addEventListener('click', () => setStep(2));
+
+      if (backSearchBtn) {
+        backSearchBtn.addEventListener('click', () => {
+          window.location.href = 'dashboard.html';
+        });
+      }
+
+      // Seleção de plano
+      if (planWeeklyBtn) {
+        planWeeklyBtn.addEventListener('click', () => {
+          selectedPlan = 'WEEKLY';
+          planWeeklyBtn.classList.add('border-troop-purple');
+          planMonthlyBtn.classList.remove('border-troop-purple');
+        });
+      }
+
+      if (planMonthlyBtn) {
+        planMonthlyBtn.addEventListener('click', () => {
+          selectedPlan = 'MONTHLY';
+          planMonthlyBtn.classList.add('border-troop-purple');
+          planWeeklyBtn.classList.remove('border-troop-purple');
+        });
+      }
+
+      // Seleção de método de pagamento
+      if (payPixBtn) {
+        payPixBtn.addEventListener('click', () => {
+          selectedPaymentMethod = 'PIX';
+          renderPaymentForm();
+        });
+      }
+
+      if (payCardBtn) {
+        payCardBtn.addEventListener('click', () => {
+          selectedPaymentMethod = 'CARD';
+          renderPaymentForm();
+        });
+      }
+
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+          alert(
+            'Contratação simulada com sucesso! No produto final, você verá aqui a confirmação oficial da rota Troop.'
+          );
+          window.location.href = 'concluido.html';
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          hydrateFromSession();
+          renderPaymentForm();
+          setStep(1);
+        });
+      } else {
+        hydrateFromSession();
+        renderPaymentForm();
+        setStep(1);
+      }
+    </script>
+  </body>
+</html>

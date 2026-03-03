@@ -75,15 +75,25 @@ function initAuthBindings() {
         localStorage.setItem('troop_logged_in', '1');
       } catch (_) {}
 
+      // Decide redirecionamento pós-login
+      let redirectTarget = 'dashboard.html';
+      try {
+        const pendingRedirect = sessionStorage.getItem('post_login_redirect');
+        const hasActiveSearch = !!sessionStorage.getItem('active_search');
+
+        if (pendingRedirect) {
+          redirectTarget = pendingRedirect;
+          sessionStorage.removeItem('post_login_redirect');
+        } else if (hasActiveSearch) {
+          redirectTarget = 'dashboard.html';
+        }
+      } catch (_) {}
+
       // Se a página principal definir um callback global, usamos o fluxo de modal
       if (typeof window.handleLoginSuccess === 'function') {
         window.handleLoginSuccess(data);
       } else {
-        // Fluxo padrão: veio de login.html, marca origem e volta para index
-        try {
-          sessionStorage.setItem('from_login', '1');
-        } catch (_) {}
-        window.location.href = 'index.html';
+        window.location.href = redirectTarget;
       }
     } catch (err) {
       if (err.status === 400 || err.status === 401) {
